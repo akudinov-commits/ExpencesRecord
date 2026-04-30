@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Projects/agentic-platform/**)",
+      "Read(//c/test-ws/**)",
+      "Read(//c/actual-solutions/docs/final/**)"
+    ]
+  }
+}
