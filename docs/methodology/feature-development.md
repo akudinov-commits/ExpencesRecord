@@ -9,7 +9,7 @@
 ## TL;DR — the cycle
 
 ```
-1. Understand           → read checklist + step file + architecture.md
+1. Understand           → read checklist + step file + feature-architecture.md
 2. Locate what exists   → grep / read existing patterns the step points at
 3. Design contracts     → types, signatures, data shapes (no implementation yet)
 4. Implement minimally  → enough code to satisfy the step, nothing more
@@ -28,7 +28,7 @@ The cycle assumes the checklist and step file already exist. If they don't, see 
 Before writing anything:
 
 - Read the checklist's **Goal**, **Scope**, and **Notes**.
-- Read the feature's `architecture.md` — pipeline, component diagram, data flow.
+- Read the feature's `feature-architecture.md` — pipeline, component diagram, data flow.
 - Read the step file end-to-end. Pay attention to:
   - **What Exists** — current state of the codebase for this step.
   - **What to Build** — the concrete deliverables.
@@ -76,7 +76,7 @@ If the contract introduces a new pattern (new abstraction, new module boundary, 
 
 ## 5. Test
 
-Follow `ongoing-tasks/execution-prompt.md` for the per-task-type rules. Short version:
+Follow `prompts/execution.md` for the per-task-type rules. Short version:
 
 | Task type | Approach |
 |-----------|----------|
@@ -128,7 +128,7 @@ Before ticking the checklist item:
 
 - Mark the checklist item `[x]`.
 - Add a dated entry to the checklist's `## Notes` if anything non-obvious happened (a deviation, a discovered gotcha, a deferred follow-up).
-- Report briefly per `ongoing-tasks/execution-prompt.md`'s format. No standalone summary documents.
+- Report briefly per `prompts/execution.md`'s format. No standalone summary documents.
 
 ---
 

@@ -6,23 +6,25 @@ Active work orders. **One feature = one checklist + one steps folder.**
 
 - `{feature-name}-checklist.md` is the **single source of truth** for an initiative (goal, scope, step links, notes).
 - `{feature-name}/` holds granular, self-contained step files: `NN-{feature-name}-<short-kebab>.md`.
-- `{feature-name}/architecture.md` is the feature's mental model — read at the start of every step.
+- `{feature-name}/feature-architecture.md` is the feature's mental model — read at the start of every step.
 - No separate `plan.md`. The checklist *is* the plan.
 - Completed or superseded work moves to `archive/`.
 
-## System prompts in this folder
+## System prompts
 
-| File | Purpose |
-|------|---------|
-| `execution-prompt.md` | TDD cycle, task classification, reporting format. The AI follows this when executing any step. |
-| `audit-checklist-prompt.md` | Post-implementation audit. Run against a finished or in-progress checklist to detect drift, missing tests, dead code, broken wiring. |
+All operator prompts (execution, audit, bootstrap, session-start, etc.) live in [`prompts/`](../prompts/). The two most relevant for ongoing-tasks work:
+
+| Prompt | Purpose |
+|--------|---------|
+| [`prompts/execution.md`](../prompts/execution.md) | TDD cycle, task classification, reporting format. The AI follows this when executing any step. |
+| [`prompts/audit-checklist.md`](../prompts/audit-checklist.md) | Post-implementation audit. Run against a finished or in-progress checklist to detect drift, missing tests, dead code, broken wiring. |
 
 ## Starting a new initiative
 
-1. Copy `_template/checklist.md` → `{feature-name}-checklist.md`.
-2. Copy `_template/feature/` → `{feature-name}/`.
-3. Replace `{feature-name}` placeholders inside the copied files. Rename step files: `01-first-step.md` → `01-{feature-name}-<short-kebab>.md`.
-4. Fill in `{feature-name}/architecture.md` first (pipeline, components, data flow).
+1. Copy `_template/_template-checklist.md` → `{feature-name}-checklist.md`.
+2. Copy `_template/_template/` → `{feature-name}/`.
+3. Rename every occurrence of `_template` / `feature-name` in filenames and inside the files.
+4. Fill in `{feature-name}/feature-architecture.md` first (pipeline, components, data flow).
 5. Write Goal + Scope in the checklist; write at least step `01` in detail.
 
 ## Full conventions

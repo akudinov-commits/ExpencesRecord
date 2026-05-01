@@ -1,7 +1,7 @@
 # <<PROJECT_NAME>> — Architecture Overview
 
 > System-level topology. Read at session start. Updated when the topology changes.
-> Feature-level architecture lives in `ongoing-tasks/{feature}/architecture.md`, not here.
+> Feature-level architecture lives in `ongoing-tasks/{feature}/feature-architecture.md`, not here.
 
 ---
 
@@ -84,7 +84,7 @@ See [`adr/readme.md`](../../adr/readme.md) for the full index. The architectural
 
 ## 8. Where to add detail
 
-- **Feature-level architecture** — `ongoing-tasks/{feature}/architecture.md`
+- **Feature-level architecture** — `ongoing-tasks/{feature}/feature-architecture.md`
 - **Per-stack recipes** — `docs/methodology/<<STACK_RECIPE>>.md`
 - **Specific decisions** — `adr/NNN-*.md`
 - **Hard rules / tripwires** — `CLAUDE.md`

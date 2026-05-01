@@ -6,6 +6,8 @@ This repo is **not a working project**. It is a structured prompt system — a s
 
 The same idea drives serious AI-coding setups in larger codebases. This repo distils the pattern into a stack-agnostic skeleton that you can copy and adapt.
 
+> **What you'll find where.** This file explains *what the template is and why it works that way*. For prompts, lifecycle commands, and day-to-day operator recipes, see [ai-workflow.md](ai-workflow.md).
+
 ---
 
 ## The 30-second pitch
@@ -13,8 +15,8 @@ The same idea drives serious AI-coding setups in larger codebases. This repo dis
 AI coding here is not "chat and hope." It runs on **three layers of guidance** plus **structured work orders**:
 
 1. **Auto-loaded rules** (`CLAUDE.md` + `.github/copilot-instructions.md`) — what the AI must never violate. Loaded every turn, no matter what.
-2. **Session bootstrap** (`session-start.md`) — read once per session. Where things live, what the non-negotiables are.
-3. **Execution protocol** (`ongoing-tasks/execution-prompt.md`) — how to run a task: classification, TDD where it applies, reporting format.
+2. **Session bootstrap** (`prompts/session-start.md`) — read once per session. Where things live, what the non-negotiables are.
+3. **Execution protocol** (`prompts/execution.md`) — how to run a task: classification, TDD where it applies, reporting format.
 
 Work is organised as **checklists + step files**. One feature = one checklist (the source of truth) + one folder of granular, self-contained steps. The human points the AI at a checklist; the AI ticks its way through the steps.
 
@@ -26,19 +28,38 @@ Architectural decisions live in **ADRs** under [`adr/`](adr/). The AI reads them
 
 ```
 .
-├── readme.md                       This file — vision, context flow, how to bootstrap
+├── template-readme.md               This file — template concept, context flow, why-it-works
+├── readme.md                        (the project's own readme — not part of this template; create or keep your existing one)
+├── ai-workflow.md                  Operator handbook — prompts, lifecycle, daily commands
 ├── CLAUDE.md                       Auto-loaded routing table + tripwires (Claude Code)
 ├── .github/
 │   └── copilot-instructions.md     Mirror of CLAUDE.md (auto-loaded by GitHub Copilot)
-├── session-start.md                Read-once-per-session bootstrap
-├── ai-workflow.md                  Human guide: how to drive AI sessions in this repo
+├── .ignix/
+│   └── review-instructions.md      Per-repo automated PR review rules
+│
+├── prompts/                         All operator prompts in one place
+│   ├── readme.md                    Index of prompts
+│   ├── session-start.md             Read-once-per-session bootstrap
+│   ├── execution.md                 TDD / task-classification / reporting protocol
+│   ├── audit-checklist.md           Post-implementation audit prompt
+│   ├── continue-session.md          Resume after a break / context reset
+│   ├── scope-task.md                Dry-run a step (plan only, no code)
+│   ├── add-stack.md                 Introduce a new stack post-bootstrap
+│   └── bootstrap/                   First-time setup, three phases
+│       ├── 01-discovery.md          Read-only scan, factual placeholders
+│       ├── 02-interview.md          AI asks human for tripwires/architecture
+│       └── 03-apply.md              Strict write of approved values
 │
 ├── docs/
 │   ├── methodology/
-│   │   ├── task-workflow.md        How checklists + step files work (conventions, lifecycle)
-│   │   └── feature-development.md  Generic feature recipe — the "how" of building
+│   │   ├── task-workflow.md        Checklists + step files conventions, lifecycle
+│   │   ├── feature-development.md  Generic feature recipe — the "how" of building
+│   │   ├── dotnet-service.md       Stub recipe — fill on bootstrap
+│   │   ├── python-service.md       Stub recipe — fill on bootstrap
+│   │   ├── node-service.md         Stub recipe — fill on bootstrap
+│   │   └── react-ui.md             Stub recipe — fill on bootstrap
 │   └── architecture/
-│       └── overview.md             Project topology (placeholders to fill on bootstrap)
+│       └── overview.md             System topology (placeholders to fill on bootstrap)
 │
 ├── adr/
 │   ├── readme.md                   ADR index + format guide
@@ -46,13 +67,11 @@ Architectural decisions live in **ADRs** under [`adr/`](adr/). The AI reads them
 │
 └── ongoing-tasks/
     ├── readme.md                   TL;DR + pointer to methodology
-    ├── execution-prompt.md         TDD / task-classification / reporting protocol
-    ├── audit-checklist-prompt.md   Post-implementation audit prompt
     ├── _template/                  Copy-paste starter for a new initiative
-    │   ├── checklist.md            → copy to ../{feature-name}-checklist.md
-    │   └── feature/                → copy to ../{feature-name}/
-    │       ├── architecture.md
-    │       └── 01-first-step.md
+    │   ├── _template-checklist.md
+    │   └── _template/
+    │       ├── feature-architecture.md
+    │       └── 01-_template-first-step.md
     └── archive/                    Completed or superseded checklists land here
 ```
 
@@ -60,7 +79,7 @@ Architectural decisions live in **ADRs** under [`adr/`](adr/). The AI reads them
 
 ## How the AI builds context — the layered flow
 
-When a human says *"Read session-start.md. Follow methodology. Execute the next unticked step in `feature-x-checklist.md`"*, the agent assembles its working context in layers:
+When a human says *"Read prompts/session-start.md. Follow methodology. Execute the next unticked step in `feature-x-checklist.md`"*, the agent assembles its working context in layers:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -75,9 +94,9 @@ When a human says *"Read session-start.md. Follow methodology. Execute the next 
                               ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │  LAYER 1 — SESSION BOOTSTRAP                                        │
-│  Trigger: human says "Read session-start.md"                        │
+│  Trigger: human says "Read prompts/session-start.md"                 │
 │                                                                     │
-│  session-start.md instructs the agent to read, in order:            │
+│  prompts/session-start.md instructs the agent to read, in order:    │
 │    • adr/readme.md            (active constraints)                  │
 │    • docs/architecture/*.md   (system topology)                     │
 │    • ongoing-tasks/readme.md  (where active work lives)             │
@@ -104,7 +123,7 @@ When a human says *"Read session-start.md. Follow methodology. Execute the next 
 │  Trigger: human says "Execute step NN" or "next unticked step"      │
 │                                                                     │
 │  ongoing-tasks/{feature}-checklist.md  (source of truth)            │
-│  ongoing-tasks/{feature}/architecture.md  (feature mental model)    │
+│  ongoing-tasks/{feature}/feature-architecture.md  (feature mental model)    │
 │  ongoing-tasks/{feature}/NN-{feature}-<short>.md  (the work order)  │
 │                                                                     │
 │  Step file sections: Goal · Track · What Exists · What to Build ·   │
@@ -162,59 +181,15 @@ Both files are **auto-loaded** by their respective tools — Claude Code reads `
 
 > Why duplicate instead of pointing? Auto-load is path-specific. A pointer file (`> See ../CLAUDE.md`) is unreliable — the agent may not chase it before generating code. Two copies of the rules is annoying; the AI silently violating them because it never read the rules is worse.
 
-If your team only uses one tool, delete the other file and update `readme.md` to match.
+If your team only uses one tool, delete the other file and update this map to match.
 
 ---
 
-## How to use this repo
+## Two modes of operation
 
-There are two paths: **bootstrap mode** (you just copied this template into a project) and **steady-state mode** (the project is already running on the methodology).
+**Bootstrap mode** — if `<<PLACEHOLDERS>>` (double angle brackets) are still present anywhere in the repo, you are in bootstrap mode. The bootstrap workflow runs in **three phases** — a read-only **Discovery** pass (scans the repo for factual placeholders), an **Interview** pass (AI asks the human about tripwires, architecture, and recipe decisions), and an **Apply** pass (strict write of approved values). All three prompts live in [`prompts/bootstrap/`](prompts/bootstrap/). The AI should **not** invent ADRs, methodology recipes, tripwires, or feature checklists during bootstrap — those are human-driven decisions captured in the Interview phase.
 
-### Bootstrap mode — first-time setup in a new or existing project
-
-If `<<PLACEHOLDERS>>` (double angle brackets) are still present anywhere in the repo, you are in bootstrap mode. Run this prompt against the repo root:
-
-```
-You are bootstrapping a new project from the context-driven-dev-sample template.
-
-1. Read readme.md (this file) end-to-end.
-2. Scan the host project (or describe-the-target-system if greenfield) and detect:
-   - Primary language(s) and runtime
-   - Build / package tooling
-   - Test framework(s)
-   - Existing folder structure and entry points
-   - Any existing rules files (.editorconfig, .eslintrc, ruff.toml, etc.)
-
-3. Walk every file in this template that contains `<<PLACEHOLDER>>` markers.
-   For each placeholder:
-   - If you can fill it confidently from the scan, propose the value.
-   - If not, list the open question for the human.
-   Do NOT write changes yet — produce a single proposal document first.
-
-4. Propose initial CLAUDE.md tripwires based on the detected stack
-   (e.g., for TypeScript: "no any", "no raw fetch in components", etc.).
-   Reference: the example tripwire patterns in this template's CLAUDE.md.
-
-5. Wait for human approval. Then:
-   - Apply approved values to all placeholders.
-   - Mirror CLAUDE.md content to .github/copilot-instructions.md.
-   - Fill docs/architecture/overview.md skeleton with what you learned.
-   - Leave adr/_template.md untouched. Do not invent ADRs without human input.
-   - Leave ongoing-tasks/_template/ untouched. Do not invent feature checklists.
-
-6. Report which placeholders remain unfilled and why.
-```
-
-The AI should **not** invent ADRs, methodology recipes, or feature checklists during bootstrap. Those are human-driven decisions; bootstrap only fills the scaffolding.
-
-### Steady-state mode — driving real work
-
-See [`ai-workflow.md`](ai-workflow.md) for the full human-facing workflow (how to start a session, continue, jump to a step, scope a task without coding). The short version:
-
-```
-Read session-start.md. Then execute ongoing-tasks/{feature}-checklist.md
-starting from the first unticked step.
-```
+**Steady-state mode** — once placeholders are gone, work proceeds checklist-by-checklist. Driving prompts, continuation prompts, audit prompts, and the post-bootstrap "add a new stack" prompt all live in [`prompts/`](prompts/). The operator handbook in [ai-workflow.md](ai-workflow.md) describes when to use each one.
 
 ---
 
@@ -222,11 +197,13 @@ starting from the first unticked step.
 
 | Want to… | Do this |
 |----------|---------|
-| Add a stack-specific recipe (e.g., `dotnet-service.md`, `react-ui.md`) | Add a file under `docs/methodology/`. Link it from `CLAUDE.md` "Where to Read What" table. |
+| Fill in a stack recipe stub | Edit the matching file under `docs/methodology/` (`dotnet-service.md`, `python-service.md`, `node-service.md`, `react-ui.md`). Already linked from `CLAUDE.md` “Where to Read What”. |
+| Add a brand-new stack recipe (e.g., `go-service.md`) | Add a file under `docs/methodology/`. Link it from `CLAUDE.md` “Where to Read What”. |
 | Add a stack-specific tripwire | Edit `CLAUDE.md`. Mirror to `.github/copilot-instructions.md`. |
 | Record an architectural decision | Copy `adr/_template.md` → `adr/NNN-title.md`. Update `adr/readme.md` index. |
-| Start a feature | Copy `ongoing-tasks/_template/checklist.md` → `ongoing-tasks/{feature}-checklist.md`. Copy `ongoing-tasks/_template/feature/` → `ongoing-tasks/{feature}/`. Rename and fill. |
+| Start a feature | Copy `ongoing-tasks/_template/_template-checklist.md` → `ongoing-tasks/{feature}-checklist.md`. Copy `_template/_template/` → `ongoing-tasks/{feature}/`. Rename and fill. |
 | Archive a finished feature | Move the checklist + folder pair into `ongoing-tasks/archive/`. |
+| Customise automated PR review | Edit `.ignix/review-instructions.md` — it is fetched from the target branch and prepended to the reviewer's default prompt. |
 
 ---
 

@@ -1,6 +1,6 @@
 # Task Workflow — Plans, Checklists, Steps
 
-> How AI agents and humans plan and execute work in this repo. Read this when starting or refactoring a plan. Referenced by `CLAUDE.md` and `session-start.md`.
+> How AI agents and humans plan and execute work in this repo. Read this when starting or refactoring a plan. Referenced by `CLAUDE.md` and `prompts/session-start.md`.
 
 ---
 
@@ -13,16 +13,14 @@
 ```
 ongoing-tasks/
 ├── readme.md                                    short conventions pointer
-├── execution-prompt.md                          execution protocol (TDD, classification, reporting)
-├── audit-checklist-prompt.md                    post-implementation audit prompt
 ├── _template/                                   copy-paste starter
-│   ├── checklist.md                             → copy to ../{feature-name}-checklist.md
-│   └── feature/                                 → copy to ../{feature-name}/
-│       ├── architecture.md                      feature architecture overview
-│       └── 01-first-step.md                     rename to 01-{feature-name}-<short-kebab>.md
+│   ├── _template-checklist.md
+│   └── _template/
+│       ├── feature-architecture.md              feature architecture overview
+│       └── 01-_template-first-step.md
 ├── {feature-name}-checklist.md                  THE source of truth
 ├── {feature-name}/                              steps folder (name matches checklist)
-│   ├── architecture.md                          pipeline, component diagram, data flow
+│   ├── feature-architecture.md                  pipeline, component diagram, data flow
 │   ├── 01-{feature-name}-<short-kebab>.md
 │   ├── 02-{feature-name}-<short-kebab>.md
 │   └── ...
@@ -61,7 +59,7 @@ One to three sentences. What changes for the user or system when this is done.
 - Dependencies: links to other checklists / ADRs / services
 
 ## Architecture
-See [architecture.md](./{feature-name}/architecture.md) for the big-picture overview.
+See [feature-architecture.md](./{feature-name}/feature-architecture.md) for the big-picture overview.
 
 ## Steps
 - [ ] [01 — short title](./{feature-name}/01-{feature-name}-short-kebab.md)
@@ -115,7 +113,7 @@ Which stack or service this step targets.
 
 ## Architecture file template
 
-Every feature folder ships an `architecture.md`. It is the feature's mental model — read by every contributor before any step work begins.
+Every feature folder ships a `feature-architecture.md`. It is the feature's mental model — read by every contributor before any step work begins.
 
 Required sections:
 1. **Pipeline / integration** — how this feature fits into the system's data or request flow.
@@ -125,21 +123,20 @@ Required sections:
 5. **Extension points** — how new adapters or handlers plug in without modifying existing code.
 6. **Security & isolation** — auth model, network boundaries, credential management, trust boundaries.
 
-The full template is `ongoing-tasks/_template/feature/architecture.md`.
+The full template is `ongoing-tasks/_template/_template/feature-architecture.md`.
 
 ---
 
 ## Lifecycle
 
 1. **Create**
-   - Copy `_template/checklist.md` → `{feature-name}-checklist.md`.
-   - Copy `_template/feature/` folder → `{feature-name}/`.
-   - Replace `{feature-name}` placeholders in the copied files; rename `01-first-step.md` to `01-{feature-name}-<short-kebab>.md`.
-   - Fill in `{feature-name}/architecture.md` first — shared mental model before step work.
-   - Write at least the first step. Subsequent steps can be stubbed and filled as scope clarifies.
+   - Copy `_template/_template-checklist.md` → `{feature-name}-checklist.md`.
+   - Copy `_template/_template/` folder → `{feature-name}/`.
+   - Fill in `{feature-name}/feature-architecture.md` first — shared mental model before step work.
+   - Rename and write at least the first step. Subsequent steps can be stubbed and filled as scope clarifies.
 
 2. **Execute**
-   - Agent reads the checklist, then `{feature-name}/architecture.md`.
+   - Agent reads the checklist, then `{feature-name}/feature-architecture.md`.
    - Agent picks the next unticked step, opens the step file.
    - Agent implements → writes/updates tests → ticks the checklist item.
    - Agent does **not** edit the step file's scope mid-flight except to correct factual mistakes. If scope changes, add a new step.

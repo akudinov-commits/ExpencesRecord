@@ -6,7 +6,7 @@ description: "Execute the next unticked step in a checklist. Apply TDD where it 
 
 **Purpose:** Guides AI agent execution of work in `ongoing-tasks/`. Apply TDD where it adds value, pragmatic verification elsewhere.
 
-For repo orientation, read `session-start.md` first.
+For repo orientation, read `prompts/session-start.md` first.
 For stack rules and tripwires, see `CLAUDE.md` (or `.github/copilot-instructions.md`).
 For file layout and templates, see `docs/methodology/task-workflow.md`.
 For the per-stack feature recipe, see `docs/methodology/feature-development.md`.
@@ -45,7 +45,7 @@ Classify each checklist item before starting it:
 
 ```
 1. Open the checklist: ongoing-tasks/{feature}-checklist.md
-2. Read ongoing-tasks/{feature}/architecture.md for the big-picture context
+2. Read ongoing-tasks/{feature}/feature-architecture.md for the big-picture context
 3. Find first unchecked [ ] step
 4. Open the linked step file under ongoing-tasks/{feature}/NN-*.md
 5. Classify task type (CODE / CONTRACT / CONFIG / INFRA / CLEANUP / UI)
