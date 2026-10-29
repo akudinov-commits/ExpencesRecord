@@ -6,16 +6,24 @@ Humans drive the workflow by selecting a prompt; AI agents execute it. If you fi
 
 ## How to invoke
 
-Each prompt declares its arguments in an `## Arguments` section near the top. Pass them on the same line as the file reference, `key=value` style:
+Each prompt declares its arguments in an `## Arguments` section near the top. Pass them on the same line as the file reference, `key=value` style. The reference syntax is tool-specific:
+
+| Tool | Syntax |
+|------|--------|
+| Claude Code | `@prompts/bootstrap/01-discovery.md mode=brownfield` |
+| GitHub Copilot Chat | `#file:prompts/bootstrap/01-discovery.md mode=brownfield` |
+| Cursor | `@prompts/bootstrap/01-discovery.md mode=brownfield` |
+| Other / generic | Paste the file contents into chat, or reference the path with your tool's file-reference convention. Always include the arguments. |
+
+More examples (Copilot syntax shown; substitute your tool's prefix):
 
 ```
-#file:prompts/bootstrap/01-discovery.md   mode=brownfield
-#file:prompts/audit-checklist.md          checklist=ongoing-tasks/payments-checklist.md
-#file:prompts/continue-session.md         feature=payments   step=03
-#file:prompts/add-stack.md                stack=go   service_path=services/notifier
+#file:prompts/audit-checklist.md      checklist=ongoing-tasks/payments-checklist.md
+#file:prompts/continue-session.md     feature=payments   step=03
+#file:prompts/add-stack.md            stack=go   service_path=services/notifier
 ```
 
-Prompts with no arguments are referenced bare:
+Prompts with no arguments are referenced bare (no `key=value` tail):
 
 ```
 #file:prompts/session-start.md

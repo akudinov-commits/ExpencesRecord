@@ -133,14 +133,15 @@ The full template is `ongoing-tasks/_template/_template/feature-architecture.md`
    - Copy `_template/_template-checklist.md` → `{feature-name}-checklist.md`.
    - Copy `_template/_template/` folder → `{feature-name}/`.
    - Fill in `{feature-name}/feature-architecture.md` first — shared mental model before step work.
-   - Rename and write at least the first step. Subsequent steps can be stubbed and filled as scope clarifies.
+   - **Plan the full step list upfront, with the human** — every step's title + one-line scope, in dependency order, written into the checklist *before* execution begins. This list is the agreed plan. A step's detailed file may be stubbed now and its body written just before that step runs — but the stub already **fixes that step's scope**; writing the body later only expands the agreed scope, it never introduces new scope or new steps. Scope is not "discovered" during execution.
 
 2. **Execute**
    - Agent reads the checklist, then `{feature-name}/feature-architecture.md`.
    - Agent picks the next unticked step, opens the step file.
    - Agent implements → writes/updates tests → ticks the checklist item.
-   - Agent does **not** edit the step file's scope mid-flight except to correct factual mistakes. If scope changes, add a new step.
-   - Never edit a completed step's scope — write a follow-up step instead.
+   - Agent does **not** edit the step file's scope mid-flight except to correct factual mistakes.
+   - **The agent never invents, adds, splits, merges, reorders, or re-scopes steps during execution, and never moves scope between steps.** If execution shows the plan is wrong or incomplete — a step is missing, a step's scope is off, a new feature or cross-cutting tool is needed — **STOP and agree the change with the human first**, then update the checklist. Plan changes are a shared, explicit decision, never autonomous (same hard gate as architectural decisions).
+   - Never edit a completed step's scope; a follow-up step is added only as an agreed plan change.
    - Do not create summary markdown files — the checklist + commit history + ADRs are the record.
 
 3. **Log decisions**

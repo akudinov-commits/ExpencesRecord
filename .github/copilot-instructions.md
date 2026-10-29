@@ -2,6 +2,8 @@
 
 > **MANDATORY: No architectural decisions without explicit human approval.** Present the idea, explain the tradeoffs, and WAIT for approval before writing any code. This includes new files, new interfaces, new data stores, new services, DI changes, and any structural changes. Never proceed autonomously on design decisions.
 
+> **MANDATORY: The plan is fixed upfront — never invent or change steps mid-execution.** A feature's step list (every step's title + scope, in dependency order) is the agreed plan, authored **with the human before execution begins** and written into the checklist. While executing, do ONLY what the current step already specifies. You may **not** add a new step, split / merge / reorder steps, move scope between steps, expand a step's scope, or introduce a new step / feature / cross-cutting tool on your own — not even "helpfully." If execution reveals the plan is wrong, incomplete, or that something new is needed: **STOP, say so, and agree the change with the human first** — then update the checklist. Writing the detail of an already-agreed step before you run it is fine; inventing scope is not. This is the same hard gate as the architecture rule above.
+
 > **Auto-loaded every session.** This file is a routing table + tripwires. It tells the AI where to find details and what to never do. Keep it lean.
 
 > **If `<<PLACEHOLDERS>>` are still present below, this repo is in bootstrap mode.** See [template-readme.md § Bootstrap mode](template-readme.md#bootstrap-mode--first-time-setup-in-a-new-or-existing-project) before continuing.
@@ -104,6 +106,7 @@ Two tiers. **Universal** rules ship as non-negotiable defaults — flip them off
 - Architecture file: feature-level pipeline / component diagram / data flow / data stores / extension points / security.
 - Step file sections: Goal · Track · What Exists · What to Build · Acceptance Criteria · References.
 - Numbering: zero-padded `NN`. Phased (`1.1`, `2.3`) only when the checklist explicitly groups into tracks.
+- **Steps are planned upfront; never invented mid-execution** (see the upfront-plan banner). The full step list — every step's title + scope, in dependency order — is written into the checklist when the feature is planned, *with the human*. A step's detailed file may be written just before that step runs, but it only **expands already-agreed scope**; it never introduces new scope, steps, or re-scoping. A not-yet-detailed step stays a **plain (unlinked) line** tagged `(planned · detail written before execution)`; a checklist line links to a step file **only if that file exists** (no link to a missing file). Adding / splitting / reordering / re-scoping a step, moving scope between steps, or adding a new feature or cross-cutting tool is a **plan change** — propose it and get explicit approval first.
 - Completed or superseded → move pair into `ongoing-tasks/archive/`.
 - **Architectural decisions** go in `adr/NNN-title.md` with sections: Status · Context · Decision · Consequences.
 - Full conventions: `docs/methodology/task-workflow.md`. Template: `ongoing-tasks/_template/`.

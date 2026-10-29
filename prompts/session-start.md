@@ -1,3 +1,7 @@
+---
+description: "Read at the start of every AI session — orientation and read-on-start order."
+---
+
 # session-start.md — Read this first
 
 > Entry point for a fresh AI session in this repo. Read this top-to-bottom at the start of every new chat or context reset.

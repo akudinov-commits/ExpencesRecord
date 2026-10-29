@@ -1,3 +1,11 @@
+---
+description: "Bootstrap phase 1 — read-only scan, fills factual placeholders only."
+arguments:
+  - name: mode
+    description: brownfield | greenfield
+    required: true
+---
+
 # Bootstrap — Phase 1: Discovery (read-only)
 
 > Reference this file to start a fresh bootstrap. Pass the project mode:

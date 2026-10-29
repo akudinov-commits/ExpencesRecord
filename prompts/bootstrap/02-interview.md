@@ -1,3 +1,11 @@
+---
+description: "Bootstrap phase 2 — AI asks the human for tripwires, architecture, and recipe decisions."
+arguments:
+  - name: mode
+    description: brownfield | greenfield
+    required: true
+---
+
 # Bootstrap — Phase 2: Interview (AI asks, human answers)
 
 > Reference this file after Phase 1 is complete and `ongoing-tasks/_bootstrap/discovery.md` is approved:

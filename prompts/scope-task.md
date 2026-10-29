@@ -1,3 +1,14 @@
+---
+description: "Dry-run a step — plan only, no code."
+arguments:
+  - name: feature
+    description: kebab-case feature name
+    required: true
+  - name: step
+    description: zero-padded step number
+    required: true
+---
+
 # Scope a task without coding
 
 > Dry-run prompt. Reference this file with the feature name and step number you want scoped:

@@ -1,3 +1,14 @@
+---
+description: "Resume in-flight work after a break or context reset."
+arguments:
+  - name: feature
+    description: kebab-case feature name
+    required: true
+  - name: step
+    description: zero-padded step number; defaults to first unticked
+    required: false
+---
+
 # Continue a session
 
 > Reference this file to resume in-flight work. Pass the feature name (and optionally a step number).

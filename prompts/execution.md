@@ -1,5 +1,5 @@
 ---
-description: "Execute the next unticked step in a checklist. Apply TDD where it adds value, pragmatic verification elsewhere."
+description: "Execute the next unticked step in a checklist. TDD for CODE, pragmatic for the rest."
 ---
 
 # Execution Prompt
@@ -55,7 +55,7 @@ Classify each checklist item before starting it:
 9. Repeat
 ```
 
-Step files are specifications — do not edit their scope while executing. If scope changes, add a new step or open an ADR.
+Step files are specifications — do not edit their scope while executing. The step list is the plan, **fixed upfront with the human**. If execution shows the plan is wrong or incomplete (a missing/mis-scoped step, a needed new feature or cross-cutting tool), **STOP and agree the change with the human first** — never add, split, reorder, or re-scope steps autonomously.
 
 ### For CODE tasks — TDD cycle
 
@@ -91,12 +91,14 @@ If a step lists `Depends on:` in its References section, verify those steps are 
 - Tick the checklist after each completed step.
 - Log blockers in the checklist's `## Notes` (dated).
 - Ask before: creating new abstractions not in the step, changing existing APIs, bulk migrations.
+- Ask before any **plan change**: adding / splitting / reordering / re-scoping steps, moving scope between steps, or introducing a new feature or cross-cutting tool. The step list is fixed upfront — propose the change and get explicit approval; do not make it yourself.
 
 **DO NOT:**
 - Write implementation before a failing test (for CODE tasks).
 - Create components / features not listed in the step.
 - Refactor or optimize beyond step scope.
 - Edit a step file's scope while executing it.
+- **Invent, add, reorder, or re-scope steps mid-execution** — the step list is agreed upfront; propose plan changes, don't make them.
 - Change build configurations without explicit need.
 - Add git commits per test phase (commit naturally at step boundaries).
 - Create summary markdown files to document what you did — the checklist + commit history + ADRs are the record.

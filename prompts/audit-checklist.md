@@ -1,5 +1,9 @@
 ---
-description: "Audit a feature initiative: Phase 1 checks each step's ACs against implementation and tests; Phase 2 scans the feature as a whole for gaps the plan missed."
+description: "Two-phase audit of a checklist initiative — step compliance + feature-wide scan."
+arguments:
+  - name: checklist
+    description: relative path to the checklist file
+    required: true
 ---
 
 # Checklist Audit

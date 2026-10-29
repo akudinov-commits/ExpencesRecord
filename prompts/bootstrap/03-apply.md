@@ -1,3 +1,7 @@
+---
+description: "Bootstrap phase 3 — strict write of approved values from decisions.md."
+---
+
 # Bootstrap — Phase 3: Apply (writes files)
 
 > Reference this file after both `discovery.md` and `decisions.md` are approved:

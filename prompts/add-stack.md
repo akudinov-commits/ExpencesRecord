@@ -1,3 +1,14 @@
+---
+description: "Add a new stack to a bootstrapped repo: tripwires + recipe + architecture update."
+arguments:
+  - name: stack
+    description: short name of the new stack (go, rust, kotlin, etc.)
+    required: true
+  - name: service_path
+    description: relative path to the new service
+    required: true
+---
+
 # Add a Stack
 
 > Use this AFTER bootstrap is complete (no `<<PLACEHOLDERS>>` in canonical files), when introducing a new language or framework that is not yet covered by the repo's tripwires or recipes.
