@@ -1,45 +1,29 @@
 ---
-description: "Read at the start of every AI session — orientation and read-on-start order."
+description: "Read at every AI session or context reset."
 ---
 
-# session-start.md — Read this first
+# Session start — ExpencesRecord
 
-> Entry point for a fresh AI session in this repo. Read this top-to-bottom at the start of every new chat or context reset.
+1. Read [CLAUDE.md](../CLAUDE.md) (byte-identical Copilot mirror), then [readme.md](../readme.md) for actual project state.
+2. Read [ai-workflow.md](../ai-workflow.md), [ADR index](../adr/readme.md) and relevant records, then [architecture](../docs/architecture/overview.md).
+3. Read the assigned feature's checklist and architecture, next ordered step, applicable stack recipe and [execution protocol](execution.md).
+4. Confirm the change belongs to approved scope. Beyond a simple 2–3-line mechanical edit, require a named feature first; any behavior change needs a feature regardless of size.
+5. Follow observed RED → minimum implementation → GREEN → refactor → rerun for every behavior change. Record actual evidence in checklist Notes; tick only after acceptance checks pass.
 
-You are working in **<<PROJECT_NAME>>** — <<ONE_LINE_PROJECT_DESCRIPTION>>.
-
-## Read-on-start (in order)
-
-1. **`CLAUDE.md`** (or `.github/copilot-instructions.md` — same content) — auto-loaded hard rules per stack. Always in context, but re-read deliberately at session start so you can recite the tripwires before writing code.
-2. **`template-readme.md`** — template orientation: what this scaffold is, the layered context flow, how the methodology works. (The project's own `readme.md`, if any, is for the project itself — read it for product context, not for the methodology.)
-3. **`adr/readme.md`** — index of architectural decisions. Read the index; open individual ADRs only when the work touches them.
-4. **`docs/architecture/overview.md`** — system topology and component map.
-
-## When the human assigns a task
-
-1. Open the initiative's checklist: `ongoing-tasks/{feature-name}-checklist.md`. This is the source of truth (goal, scope, step links).
-2. Read `ongoing-tasks/{feature-name}/feature-architecture.md` for the big-picture context (pipeline, component diagram, data flow). This is the shared mental model for the feature.
-3. Open the next unticked step from `ongoing-tasks/{feature-name}/NN-{feature-name}-*.md`. Each step is self-contained (Goal · Track · What Exists · What to Build · Acceptance Criteria · References).
-4. Identify the **target stack** and re-read the matching section in `CLAUDE.md`.
-5. If the task requires a recipe, read the matching `docs/methodology/*.md`.
-6. Check `adr/` for constraints that forbid certain approaches.
-7. Implement → add/update tests → tick the step's item in the checklist. Log decisions/blockers in the checklist's `## Notes`, not in the step file.
-8. Do **not** create throwaway markdown files to summarize what you did. Checklist ticks + commit messages + (if architectural) a new ADR are the record.
-9. For new initiatives: start from `ongoing-tasks/_template/`. Fill in `feature-architecture.md` first. Full conventions: `docs/methodology/task-workflow.md`.
-10. For the execution protocol (TDD cycle, task classification, reporting format), follow `prompts/execution.md`.
-
-## Repo map (cheat sheet)
-
+## Actual repository map
+```text
+adr/                       accepted decisions and proposed Google access
+docs/architecture/         system boundaries and deferred design
+docs/methodology/          task, feature, Node and React recipes
+ongoing-tasks/             feature checklists/steps and bootstrap inputs
+prompts/                   operator prompts
+scripts/                   existing bootstrap verification
+CLAUDE.md                  canonical rules; Copilot mirror must match
+AGENTS.md                  Codex routing to canonical rules
+readme.md                  product/current state
+ai-workflow.md             human workflow
 ```
-<<TOP_LEVEL_REPO_MAP>>
-```
-
-> Bootstrap note: replace the block above with the actual top-level layout, one line per directory, with a short purpose comment. Keep it under 25 lines — it's a cheat sheet, not a sitemap.
+Foundation source exists in apps/web/src and apps/api/src; tests mirror layers outside src, with architecture/delivery suites under tests/. Node 24/npm workspaces and pinned test/build tools are configured. Run npm ci and npm run check. GitHub CI, checked Vercel Preview delivery and protected health verification pass. Read the active checklist for current evidence and the approved one-time project initialization exception. Google auth/access and concurrent writes remain deferred.
 
 ## Non-negotiables
-
-- No secrets in code or commits.
-- AI agents never merge — changes flow through human review.
-- Tests required for new behavior.
-- No architectural decisions without explicit human approval — propose, wait, then write.
-- Tripwires in `CLAUDE.md` cannot be relaxed without an ADR.
+No business logic in controllers or infrastructure; no direct Sheets access from FE; no spreadsheet restructuring or credentials in commits; no unapproved architecture/scope; no test-after-implementation behavior work. Do not ask again for decisions already approved. No standalone task summaries, merges without explicit user instruction or automatic production writes.

@@ -1,149 +1,75 @@
-# <<PROJECT_NAME>> — Coding Rules
+# ExpencesRecord — Coding rules
 
-> **MANDATORY: No architectural decisions without explicit human approval.** Present the idea, explain the tradeoffs, and WAIT for approval before writing any code. This includes new files, new interfaces, new data stores, new services, DI changes, and any structural changes. Never proceed autonomously on design decisions.
+Read this file before work. `.github/copilot-instructions.md` must remain byte-identical. `AGENTS.md` routes Codex here.
 
-> **MANDATORY: The plan is fixed upfront — never invent or change steps mid-execution.** A feature's step list (every step's title + scope, in dependency order) is the agreed plan, authored **with the human before execution begins** and written into the checklist. While executing, do ONLY what the current step already specifies. You may **not** add a new step, split / merge / reorder steps, move scope between steps, expand a step's scope, or introduce a new step / feature / cross-cutting tool on your own — not even "helpfully." If execution reveals the plan is wrong, incomplete, or that something new is needed: **STOP, say so, and agree the change with the human first** — then update the checklist. Writing the detail of an already-agreed step before you run it is fine; inventing scope is not. This is the same hard gate as the architecture rule above.
+## Approval and scope
+No new architectural decisions without explicit human approval: new boundaries, interfaces, storage, services or DI changes need an agreed design. Existing approval in the conversation or an Accepted ADR remains valid; do not ask for it again. Routine work within an authorized plan may proceed.
 
-> **Auto-loaded every session.** This file is a routing table + tripwires. It tells the AI where to find details and what to never do. Keep it lean.
+Plan the full ordered step list with the human before execution. Each title and scope belongs in the feature checklist. A request to execute a clearly defined scope authorizes its routine decomposition; it does not authorize extra features. Detail already agreed steps before running them. If new scope or architecture is needed, stop the dependent work and agree the change before adding, splitting, merging, reordering or expanding steps.
 
-> **If `<<PLACEHOLDERS>>` are still present below, this repo is in bootstrap mode.** See [template-readme.md § Bootstrap mode](template-readme.md#bootstrap-mode--first-time-setup-in-a-new-or-existing-project) before continuing.
+## Where to read what
+| Topic | File |
+|---|---|
+| Project and current state | `readme.md` |
+| Human workflow | `ai-workflow.md` |
+| Session orientation | `prompts/session-start.md` |
+| Execution and TDD | `prompts/execution.md` |
+| Feature layout/lifecycle | `docs/methodology/task-workflow.md` |
+| Feature recipe | `docs/methodology/feature-development.md` |
+| Backend | `docs/methodology/node-service.md`, authoritative project-specific section |
+| Frontend | `docs/methodology/react-ui.md`, authoritative project-specific section |
+| Architecture | `docs/architecture/overview.md`, `adr/readme.md` |
+| Review | `.ignix/review-instructions.md`, `prompts/audit-checklist.md` |
+| Operator prompts | `prompts/readme.md` |
 
----
+## Repository state
+ExpencesRecord is a private single-user iPhone PWA for daily expenses in an existing annual Google spreadsheet. React/strict TypeScript FE, Node.js/TypeScript/Fastify BE and Vercel are selected. The foundation now contains React/Fastify shells, manifests, tests and checked-preview configuration. Expense and Google functionality are not implemented. Distinguish local verification from actual GitHub/Vercel execution; never invent deployment results.
 
-## Where to Read What
+`adr/` records decisions; `docs/` defines architecture/methodology; `ongoing-tasks/` holds features; `prompts/` holds operators; `scripts/verify-bootstrap.ps1` checks bootstrap structure. Tooling is pinned in package.json/package-lock.json: Node 24, npm workspaces, Vite, Vitest, Testing Library, ESLint and dependency-cruiser. Google flow and safe concurrent writes remain deferred.
 
-| Topic | File | When to read |
-|-------|------|--------------|
-| All operator prompts | `prompts/readme.md` | Looking for a prompt to use — index of every prompt the team uses |
-| Bootstrap (one-time, three phases) | `prompts/bootstrap/01-discovery.md` → `02-interview.md` → `03-apply.md` | Repo still has `<<PLACEHOLDERS>>` |
-| Adding a new stack post-bootstrap | `prompts/add-stack.md` | Introducing a language/framework not yet covered by tripwires or recipes |
-| Session bootstrap | `prompts/session-start.md` | Start of every session |
-| Execution protocol (TDD, task classification, reporting) | `prompts/execution.md` | Before executing any step |
-| Task workflow (checklists, step files, lifecycle) | `docs/methodology/task-workflow.md` | Starting or refactoring a plan |
-| Feature recipe (the "how") | `docs/methodology/feature-development.md` | Before implementing any feature |
-| Stack-specific recipes | `docs/methodology/<<STACK_RECIPE>>.md` | Working on a specific stack (add files as needed) |
-| .NET service recipe (stub) | `docs/methodology/dotnet-service.md` | Working on any .NET service |
-| Python service recipe (stub) | `docs/methodology/python-service.md` | Working on any Python service |
-| Node.js service recipe (stub) | `docs/methodology/node-service.md` | Working on any Node.js service |
-| React UI recipe (stub) | `docs/methodology/react-ui.md` | Working on a React/TypeScript UI |
-| PR review (auto-review instructions) | `.ignix/review-instructions.md` | Customizing what the automated reviewer flags in this repo |
-| Architectural constraints | `adr/readme.md` | Before choosing approach A over B |
-| Feature architecture overview | `ongoing-tasks/{feature}/feature-architecture.md` | Before working on any step of a feature |
-| Plan templates | `ongoing-tasks/_template/` | Creating a new initiative |
-| Post-implementation audit | `prompts/audit-checklist.md` | When verifying a completed checklist |
+## Mandatory feature gate
+- Anything beyond one simple mechanical edit totaling at most **2–3 changed lines** must have its own named feature under `ongoing-tasks/` before substantive work. Count the whole cohesive change, not each file separately.
+- Behavior changes, fixes, security/auth, architecture, dependencies, schema/formula or deployment changes require a feature **regardless of line count**. Never split work or call it CONFIG/UI/CLEANUP to bypass this gate.
+- One cohesive feature may span many files. Existing active features may cover changes only within their agreed scope; unrelated work needs a separate feature.
+- Each feature has `{feature}-checklist.md`, `{feature}/feature-architecture.md`, and ordered `NN-{feature}-<short-kebab>.md` step files. No separate plan.md or task summary.
+- Checklist: Goal · Scope · Architecture · Steps · Notes. Step: Goal · Track · What Exists · What to Build · Acceptance Criteria · References. Link steps only once their files exist; undetailed agreed steps stay unlinked and marked `(planned · detail written before execution)`.
+- Read checklist → feature architecture → current step → stack recipe → relevant ADRs → execution protocol. Mark a step complete only after its acceptance checks pass; log evidence/decisions in checklist Notes. Keep step scope stable.
+- Human review precedes moving completed/superseded pairs to `ongoing-tasks/archive/`.
 
----
+## Mandatory TDD
+- **Every behavior change:** write a focused test, run it and observe RED for the intended missing behavior; implement the minimum; run it and observe GREEN; refactor; rerun the affected suite. Include bug fixes, UI interactions, API/auth, adapters and behavior-bearing configuration.
+- Record test identity, exact commands, expected failure and actual GREEN results in checklist Notes. A compiler error, missing package, unrun test, or tests added after implementation is not adequate behavior RED evidence.
+- Toolchain bootstrapping may be needed to make tests runnable; establish the harness in its approved foundation step, then prove behavior RED before production behavior implementation. Do not use a missing harness as a test exemption.
+- Pure documentation, mechanical edits, type-only declarations and visual-only styling with no behavior use appropriate structure/type/build/visual checks; state why TDD is not applicable. If observable behavior is affected, TDD applies irrespective of classification or line count.
+- No discretionary test-skipping exemption for behavior. If tests cannot run, report the blocker and leave the step incomplete. No production financial data as test fixtures.
+- These rules are review gates. Run npm run check for types, lint, tests, import boundaries and builds. Passing checks do not themselves prove TDD chronology; retain actual RED/GREEN evidence.
 
-## Repository Shape
+## Backend tripwires
+- Controllers own HTTP validation, verified principal handoff, delegation and result mapping only. No business logic.
+- Application owns use cases, allowed-user authorization, date/year/category/currency rules, expression accumulation and exact permitted write planning. Its ports are defined inward; no Fastify/Google/Vercel imports, infra imports, environment reads or I/O.
+- Infrastructure implements ports: identity verification, credentials, external I/O and error translation. No authorization, cell selection, expense or formula policy there. Composition root wires concrete dependencies and validated config.
+- Preserve existing workbook structure, labels, formulas, calculated totals and formatting. Year routing is explicit; the user creates annual workbooks. Do not hardcode F39 as every rate. Unknown formulas/layouts/mappings fail before writes.
+- No blind write retries, serverless in-memory locking promises or exactly-once claims. Concurrency/idempotency needs an agreed design before production writes.
+- Google access/session mechanism remains Proposed; no credentials provisioned or implicit database introduced.
 
-<<PROJECT_DESCRIPTION_ONE_PARAGRAPH>>
+## Frontend tripwires
+- React/strict TypeScript, mobile-first PWA. Keep presentation/interactions distinct from a central API client. Shared DTOs contain no logic or SDK types.
+- No direct Sheets access, Google secrets, authoritative FX/accumulation or backend authorization in FE.
+- Preferred categories/currencies stay mobile-local; no desktop/server sync. No tokens in localStorage or logs.
+- Use unknown + narrowing at untrusted boundaries; no unchecked any. No unselected libraries, bearer-token conventions or enterprise UI requirements inferred from generic recipes.
 
-| Path | Stack | Purpose |
-|------|-------|---------|
-| `<<PATH_1>>` | `<<STACK_1>>` | `<<PURPOSE_1>>` |
-| `<<PATH_2>>` | `<<STACK_2>>` | `<<PURPOSE_2>>` |
+## Global safety and quality
+- Git is the system of record; AI never merges or force-pushes without explicit instruction. Never amend published commits. No commit/push implied by documentation bootstrap.
+- No secrets or real private spreadsheet identifiers in commits. Keep environment-specific values in validated configuration; ignore local .env files. Missing required config fails explicitly.
+- Validate input at boundaries and enforce policy in application. Parameterize external queries; no user text concatenated into executable commands or unsafely into formulas. Test supported numeric/formula grammar.
+- All non-health endpoints require authentication and application authorization; health exposes minimal information. Exact Google/session/CSRF mechanics require ADR resolution.
+- Structured logging without financial payloads, tokens or credentials. No silent catches masking dependency/configuration failures. No untracked TODO/FIXME or unrelated cleanup.
+- Prefer existing modules and patterns where they obey Accepted ADRs; conflicting legacy/generic examples never override these rules.
 
-> Bootstrap note: replace this table with the actual top-level directories of your project. Keep it tight — one row per deployable artifact or major module.
 
----
-
-## Global Rules
-
-Two tiers. **Universal** rules ship as non-negotiable defaults — flip them off only with an ADR. **Recommended Defaults** are opinionated starting points; turn off the ones your team disagrees with by deleting the bullet (and recording the reason in an ADR if the disagreement is non-obvious).
-
-### Universal — keep on (override only via ADR)
-
-- **Git is the system of record.** AI never merges. Changes flow through PRs / human review.
-- **No secrets in code or commits.** Use env vars, secret stores, or vaults. `.env` files are local-only and gitignored.
-- **No hardcoded URLs, connection strings, image tags, or environment-specific values.** Pull from configuration.
-- **Tests required for new behavior.** If you skip tests, state the reason in the commit message and in the checklist's `## Notes`.
-- **Validated input at every service boundary.** No trusting upstream payloads.
-- **Parameterised queries only.** No string concatenation into SQL, NoSQL filters, or shell commands.
-- **No architectural decisions without approval.** See the banner above.
-
-### Recommended Defaults — opt out by deleting (record reason if non-obvious)
-
-- **No `TODO` / `FIXME` / dead code left behind.** Either finish it inline or escalate. *(Soften to "no new TODOs without a tracking issue link" if your team intentionally uses TODO markers as work queue.)*
-- **Structured logging only.** No `print` / `console.log` / `Console.WriteLine` in production paths.
-- **Edit existing files before creating new ones.** Don't scatter new helpers — extend the closest existing module.
-- **Do not create *task summary* markdown files.** The checklist + commit history + ADRs are the record. *(Release notes, RFC drafts, and similar deliverables are explicitly allowed.)*
-- **No fallback values, default data, or graceful degradation for missing config / dependencies.** Fail explicitly with a clear error. *(High-friction in some brownfield contexts — drop if your codebase relies on graceful degradation by design.)*
-- **No `try/catch` to silently mask missing modules, imports, or build-time dependencies.** Build failures must be explicit.
-
----
-
-## Stack-Specific Tripwires
-
-> Replace the placeholder block below with one section per stack used in this repo. Keep each section short — list only the rules that prevent the most common mistakes for that stack.
-
-### <<STACK_1>> (e.g., backend services)
-
-> Full recipe: `docs/methodology/<<STACK_1_RECIPE>>.md`
-
-#### Tripwires — never do this
-- `<<TRIPWIRE_1>>` (e.g., "No business logic in controllers / endpoints")
-- `<<TRIPWIRE_2>>` (e.g., "No raw database access outside the persistence layer")
-- `<<TRIPWIRE_3>>` (e.g., "No `async void` outside event handlers")
-- `<<TRIPWIRE_4>>` (e.g., "No hardcoded connection strings or queue names")
-- `<<TRIPWIRE_5>>` (e.g., "Shared DTOs / contracts go in the contracts module — never duplicated")
-
-### <<STACK_2>> (e.g., frontend)
-
-> Full recipe: `docs/methodology/<<STACK_2_RECIPE>>.md`
-
-#### Tripwires — never do this
-- `<<TRIPWIRE_1>>` (e.g., "No `any` — use `unknown` + narrowing or a proper type")
-- `<<TRIPWIRE_2>>` (e.g., "No raw fetch / axios in components — use the shared API client")
-- `<<TRIPWIRE_3>>` (e.g., "No business logic in pages — pages compose features only")
-
----
-
-## Tasks & Plans Workflow
-
-- **One feature = one checklist + one steps folder + one architecture overview.** No separate `plan.md`.
-- Active work: `ongoing-tasks/{feature-name}-checklist.md` (source of truth) + `ongoing-tasks/{feature-name}/feature-architecture.md` (big-picture context) + `ongoing-tasks/{feature-name}/NN-{feature-name}-<short-kebab>.md` (step files).
-- Checklist sections: Goal · Scope · Architecture (link) · Steps (GitHub task list linking to step files) · Notes.
-- Architecture file: feature-level pipeline / component diagram / data flow / data stores / extension points / security.
-- Step file sections: Goal · Track · What Exists · What to Build · Acceptance Criteria · References.
-- Numbering: zero-padded `NN`. Phased (`1.1`, `2.3`) only when the checklist explicitly groups into tracks.
-- **Steps are planned upfront; never invented mid-execution** (see the upfront-plan banner). The full step list — every step's title + scope, in dependency order — is written into the checklist when the feature is planned, *with the human*. A step's detailed file may be written just before that step runs, but it only **expands already-agreed scope**; it never introduces new scope, steps, or re-scoping. A not-yet-detailed step stays a **plain (unlinked) line** tagged `(planned · detail written before execution)`; a checklist line links to a step file **only if that file exists** (no link to a missing file). Adding / splitting / reordering / re-scoping a step, moving scope between steps, or adding a new feature or cross-cutting tool is a **plan change** — propose it and get explicit approval first.
-- Completed or superseded → move pair into `ongoing-tasks/archive/`.
-- **Architectural decisions** go in `adr/NNN-title.md` with sections: Status · Context · Decision · Consequences.
-- Full conventions: `docs/methodology/task-workflow.md`. Template: `ongoing-tasks/_template/`.
-
-When the AI starts work on a step:
-1. Read `prompts/session-start.md` (session bootstrap).
-2. Read `ongoing-tasks/{feature}/feature-architecture.md` for the feature's big-picture context.
-3. Identify the target stack and re-read the matching tripwires section above.
-4. If the task requires a recipe, read the matching `docs/methodology/*.md`.
-5. Check `adr/` for constraints that forbid certain approaches.
-6. Follow `prompts/execution.md` for TDD cycle, task classification, and reporting.
-7. Implement → add/update tests → tick the checklist item → leave step files' scope intact (step files are specifications, not logs; log in the checklist's `## Notes`).
-
----
-
-## AI Tool Usage
-
-- Track progress with the agent's todo / task tracker — one entry per checklist item being worked.
-- Fire **independent** file reads / searches in parallel; sequence only when one result feeds the next.
-- Read the relevant `docs/methodology/*.md` recipe **before** proposing patterns — don't invent conventions.
-- Prefer dedicated file tools over shelling out for file operations.
-- Never amend a published commit; create a new one. Never force-push without explicit user instruction.
-
----
-
-## Security (OWASP-aware)
-
-- Validate all inputs at the service boundary.
-- Parameterize all queries. No string concatenation into SQL, NoSQL filters, or shell commands.
-- AuthN/AuthZ on every non-health endpoint. Health endpoints are anonymous and minimal.
-- Treat LLM output as untrusted input — sanitize before executing, rendering as HTML, or writing to disk.
-- Sandbox / resource-limit any user-driven code execution paths. Do not loosen these defaults without an ADR.
-
----
-
-## When in Doubt
-
-- Ask before making cross-cutting refactors.
-- Prefer extending an existing pattern over inventing a new one.
-- If a rule above contradicts the code you're editing, the **code is the legacy** — flag it as tech debt and match the closest recent pattern.
+## Implemented foundation commands
+- Node 24.22.3 / npm 11.19.1; `npm ci` then `npm run check` from the repository root. PowerShell 7 is required for verifier regression tests.
+- FE: `apps/web/src`; BE: `apps/api/src/{api,application,infrastructure,bootstrap}`; local startup: `apps/api/src/server.ts`; Vercel: thin root `api/index.ts`.
+- Tests: `apps/web/test`, `apps/api/test`, `tests/architecture`, `tests/delivery`. Architecture fixtures intentionally contain prohibited imports and are excluded from source compilation/check scans.
+- Only health is exposed. All later business endpoints must be authenticated and application-authorized by default; Google auth is feature 2. No permissive stub guard is present.
+- GitHub CI checks, checked Vercel Preview delivery and protected health verification pass; evidence is in the foundation checklist. Explicit user authorization permits merging/pushing this verified feature. One foundation-only Production initialization with domain assignment skipped was explicitly approved and completed; ongoing product production rollout remains feature 7.

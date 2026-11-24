@@ -1,148 +1,53 @@
 ---
-description: "Execute the next unticked step in a checklist. TDD for CODE, pragmatic for the rest."
+description: "Execute an approved feature step; TDD for every behavior change."
 ---
 
-# Execution Prompt
+# Execution protocol
 
-**Purpose:** Guides AI agent execution of work in `ongoing-tasks/`. Apply TDD where it adds value, pragmatic verification elsewhere.
+Read [session-start.md](session-start.md), [CLAUDE.md](../CLAUDE.md), the feature checklist/architecture/step and applicable recipe/ADRs first.
 
-For repo orientation, read `prompts/session-start.md` first.
-For stack rules and tripwires, see `CLAUDE.md` (or `.github/copilot-instructions.md`).
-For file layout and templates, see `docs/methodology/task-workflow.md`.
-For the per-stack feature recipe, see `docs/methodology/feature-development.md`.
+## Entry gate
+Beyond one simple mechanical edit totaling at most three changed lines, work must belong to a named feature. Every behavior/security/architecture/dependency/formula/deployment change requires a feature regardless of size. Verify scope and dependencies before editing. Do not split work to evade tracking.
 
----
+## Current tooling
+Node 24.22.3 / npm 11.19.1; install with `npm ci`. Run `npm run typecheck`, `npm run lint`, `npm test`, `npm run check:boundaries`, `npm run build`, or all through `npm run check`. Vitest runs web (jsdom/Testing Library), API (Node/Fastify injection) and architecture/delivery suites. PowerShell 7 is required for bootstrap-verifier regression tests. `scripts/verify-bootstrap.ps1` checks structure, not application behavior or TDD chronology. Actual remote CI/preview execution must be verified separately.
 
-## Test Frameworks
+## Classification
+Classify by effect, not filename or label:
 
-| Stack | Test Framework | Build / Test Command |
-|-------|----------------|----------------------|
-| `<<STACK_1>>` | `<<TEST_FRAMEWORK_1>>` | `<<COMMAND_1>>` |
-| `<<STACK_2>>` | `<<TEST_FRAMEWORK_2>>` | `<<COMMAND_2>>` |
+| Effect | Verification |
+|---|---|
+| Any behavior, including CODE, UI interaction, auth, adapter, serialization or config behavior | Mandatory observed RED → GREEN → refactor |
+| Pure type-only contract with no runtime behavior | Type check; runtime serialization/validation changes require TDD |
+| Pure documentation | Content, links, structure and relevant existing scripts |
+| Pure mechanical rename/move/deletion | Affected existing checks; a behavior change still requires TDD |
+| Visual-only styles/layout | Visual/accessibility check; interaction/state changes require TDD |
+| Build/deployment harness without application behavior | Parse/build/dry-run or isolated integration verification appropriate to scope; behavior changes still require TDD |
 
-> Bootstrap note: fill the table from the host project's tooling. One row per stack present in the repo.
+No classification permits implementing behavior and adding its test afterward.
 
----
+## Execution loop
+1. Open the next unticked step and verify its dependencies, acceptance criteria and approved scope.
+2. For each behavior, write one focused test through the intended boundary. Run it; confirm it fails because the intended behavior is absent. Fix harness/import/type issues first and rerun to obtain a meaningful RED.
+3. Record RED test identity, command and actual failure. Implement only enough to pass.
+4. Run the test and observe GREEN. Refactor as useful and rerun affected tests, boundary checks and build.
+5. Validate every acceptance criterion, including relevant negative cases. Never test writes against the production expense workbook.
+6. Record dated evidence in checklist Notes. Mark the step `[x]` only after checks pass. Step files remain scope specifications, not logs.
+7. Report completed behavior, actual checks and next step. Report blockers truthfully and leave blocked steps incomplete.
 
-## Task Classification
+For nonbehavioral work, record why TDD does not apply and the actual checks used. Do not fabricate test counts or claim documentation enforces test ordering automatically.
 
-Classify each checklist item before starting it:
-
-| Type | When | Approach |
-|------|------|----------|
-| **CODE** | Business logic, handlers, services, plugins, API endpoints | **TDD**: RED → GREEN → REFACTOR |
-| **CONTRACT** | Interfaces, records, enums, DTOs, event contracts | Write type + serialization test. No RED phase needed for pure data types. |
-| **CONFIG** | DI wiring, config files, middleware pipeline, build manifests | Implement → verify build compiles → integration test if behavior changes. |
-| **INFRA** | Container configs, deployment manifests, infra-as-code | Implement → deploy to a sandbox → verify manually. |
-| **CLEANUP** | File deletion, renames, moving code, removing dead code | Ensure existing tests still pass. Write new test only if a coverage gap is found. |
-| **UI** | Components, styles, design tokens, layouts | Implement → visual verify → component test for interaction logic. |
-
-**Rule:** TDD (RED → GREEN → REFACTOR) is mandatory for CODE tasks. For other types, apply the approach listed above.
-
----
-
-## Execution Loop
-
+## Evidence format
+```text
+Step / behavior:
+RED: test identifier; exact command; expected missing behavior; observed failure
+GREEN: exact command; actual result
+REFACTOR: change or none; rerun result
+Other checks: command/result or reason not applicable
 ```
-1. Open the checklist: ongoing-tasks/{feature}-checklist.md
-2. Read ongoing-tasks/{feature}/feature-architecture.md for the big-picture context
-3. Find first unchecked [ ] step
-4. Open the linked step file under ongoing-tasks/{feature}/NN-*.md
-5. Classify task type (CODE / CONTRACT / CONFIG / INFRA / CLEANUP / UI)
-6. Execute using the appropriate approach
-7. Mark [x] in checklist; log decisions/blockers under the checklist's ## Notes
-8. Report completion briefly
-9. Repeat
-```
+An unrun test, missing dependency or compilation error alone does not establish behavior RED. A passing suite alone does not establish TDD.
 
-Step files are specifications — do not edit their scope while executing. The step list is the plan, **fixed upfront with the human**. If execution shows the plan is wrong or incomplete (a missing/mis-scoped step, a needed new feature or cross-cutting tool), **STOP and agree the change with the human first** — never add, split, reorder, or re-scope steps autonomously.
+## Scope and completion
+Do not add/reorder/expand steps, interfaces, dependencies or architecture outside the approved plan. Reuse existing approval; seek a decision only for genuinely new scope. No unrelated cleanup or separate task summaries. Commit naturally only when authorized; no phase-per-test commits.
 
-### For CODE tasks — TDD cycle
-
-```
-RED:      Write failing test
-GREEN:    Write minimal code to pass
-REFACTOR: Clean up while tests stay green
-```
-
-**Test naming** — match the host project's existing convention. Common patterns:
-- `MethodName_Scenario_ExpectedResult` (e.g., C# / xUnit)
-- `should [behavior] when [condition]` (e.g., Vitest / Jest)
-- `test_{behavior}_when_{condition}` (e.g., pytest)
-
-**Test structure** (Arrange / Act / Assert):
-```
-// Arrange — set up test data and mocks
-// Act — call the method under test
-// Assert — verify expected outcome
-```
-
-### Step dependencies
-
-If a step lists `Depends on:` in its References section, verify those steps are `[x]` in the checklist before starting. Otherwise assume checklist order.
-
----
-
-## Boundaries
-
-**DO:**
-- Follow the step file exactly — file paths, type/method names, acceptance criteria as documented.
-- Write one test at a time, complete the cycle, then next test.
-- Tick the checklist after each completed step.
-- Log blockers in the checklist's `## Notes` (dated).
-- Ask before: creating new abstractions not in the step, changing existing APIs, bulk migrations.
-- Ask before any **plan change**: adding / splitting / reordering / re-scoping steps, moving scope between steps, or introducing a new feature or cross-cutting tool. The step list is fixed upfront — propose the change and get explicit approval; do not make it yourself.
-
-**DO NOT:**
-- Write implementation before a failing test (for CODE tasks).
-- Create components / features not listed in the step.
-- Refactor or optimize beyond step scope.
-- Edit a step file's scope while executing it.
-- **Invent, add, reorder, or re-scope steps mid-execution** — the step list is agreed upfront; propose plan changes, don't make them.
-- Change build configurations without explicit need.
-- Add git commits per test phase (commit naturally at step boundaries).
-- Create summary markdown files to document what you did — the checklist + commit history + ADRs are the record.
-
----
-
-## Reporting
-
-After each completed task:
-```
-✅ [Task name from checklist]
-   Tests: [count written] | Files: [list] | Next: [next task name]
-```
-
-After a TDD cycle on CODE tasks, include phase summary:
-```
-✅ {Component} — {behavior}
-   🔴 N tests written → build failed (as expected)
-   🟢 {Component} implemented → N/N pass
-   🔵 Extracted {detail} into private helper
-   Tests: N new (M total) | Files: {list}
-   Next: {next task name}
-```
-
-For non-CODE tasks, keep it short:
-```
-✅ {Task name}
-   Updated: {files} | Next: {next task name}
-```
-
-### When issues arise
-```
-⚠️ [Task name] — [problem description]
-   🐛 [what went wrong]
-   💡 [proposed fix or question]
-   ⏸️ Waiting for guidance
-```
-
----
-
-## Completion
-
-When every top-level item in the checklist is `[x]`:
-1. Run the full test suite for affected components.
-2. Verify each step's Acceptance Criteria is satisfied.
-3. Report final summary: total tests, files changed, any deferred items.
-4. Wait for approval before moving the pair into `ongoing-tasks/archive/`.
+On completion, run affected checks, verify acceptance criteria, report actual results and deferred choices, and wait for human review before archiving the checklist/folder pair. No merge or deployment is implied.

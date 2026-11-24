@@ -11,7 +11,7 @@ arguments:
 
 # Add a Stack
 
-> Use this AFTER bootstrap is complete (no `<<PLACEHOLDERS>>` in canonical files), when introducing a new language or framework that is not yet covered by the repo's tripwires or recipes.
+> Use this AFTER bootstrap is complete (no unresolved template markers in canonical files), when introducing a new language or framework that is not yet covered by the repo's tripwires or recipes.
 >
 > Reference this file with the new stack's name and path:
 >

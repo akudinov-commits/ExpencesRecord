@@ -22,7 +22,7 @@ arguments:
 
 ## When to use
 
-The first prompt to run after dropping the template into a new (or existing) project, while `<<PLACEHOLDERS>>` are still present.
+The first prompt to run after dropping the template into a new (or existing) project, while unresolved double-angle template markers remain in canonical configuration.
 
 ---
 
@@ -39,13 +39,13 @@ You are running BOOTSTRAP PHASE 1 — DISCOVERY in the `mode` the user passed ab
 
 | Placeholder | Source |
 |-------------|--------|
-| `<<PROJECT_NAME>>` | `package.json`, `*.csproj`, `pyproject.toml` |
-| `<<TOP_LEVEL_REPO_MAP>>` | top-level directory listing |
-| `<<STACK_N>>` | manifest files present |
-| `<<TEST_FRAMEWORK_N>>` | test deps in manifests |
-| `<<COMMAND_N>>` | `package.json` scripts, Makefile, csproj targets, pyproject scripts |
-| `<<PATH_N>>` | top-level deployable directories |
-| `<<PURPOSE_N>>` | only if a directory's `readme.md` states it in one line; otherwise UNKNOWN |
+| `PROJECT_NAME` (double-angle marker name) | `package.json`, `*.csproj`, `pyproject.toml` |
+| `TOP_LEVEL_REPO_MAP` (double-angle marker name) | top-level directory listing |
+| `STACK_N` (double-angle marker name) | manifest files present |
+| `TEST_FRAMEWORK_N` (double-angle marker name) | test deps in manifests |
+| `COMMAND_N` (double-angle marker name) | `package.json` scripts, Makefile, csproj targets, pyproject scripts |
+| `PATH_N` (double-angle marker name) | top-level deployable directories |
+| `PURPOSE_N` (double-angle marker name) | only if a directory's `readme.md` states it in one line; otherwise UNKNOWN |
 
 ## Out of scope (defer to Interview)
 
@@ -59,7 +59,7 @@ You are running BOOTSTRAP PHASE 1 — DISCOVERY in the `mode` the user passed ab
 
 1. Read `prompts/readme.md`, `template-readme.md`, and `ai-workflow.md` so you know the target shape.
 2. If `mode=brownfield`: walk the repo. Read manifest files (`package.json`, `pyproject.toml`, `*.csproj`, `*.sln`, `go.mod`, `Cargo.toml`, `Dockerfile`, `.github/workflows/`, `Makefile`). Do not read source code beyond entry points (`main.*`, `Program.cs`, `app.py`, `index.ts`, etc.).
-3. List EVERY file in the template that contains `<<PLACEHOLDER>>` markers — use grep, not memory.
+3. List EVERY file in the template that contains double-angle template markers — use `rg`, not memory.
 4. For each placeholder in scope, classify:
    - **CONFIDENT** — value derivable from one or more files; cite `file:line`.
    - **UNCERTAIN** — guess plus alternatives considered.

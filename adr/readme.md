@@ -1,53 +1,14 @@
-# Architectural Decision Records (ADRs)
+# Architecture decision records
 
-This folder holds ADRs for the project. Each decision is a separate file: `NNN-title.md`.
+Accepted records capture decisions already approved by the user. Proposed details require a decision before implementation.
 
-ADRs are **constraint definitions** — the AI reads them to learn what approaches are off-limits, not to understand history. They sit at priority 2 in the rule hierarchy (above methodology, below the auto-loaded tripwires in `CLAUDE.md`).
+| ADR | Status |
+|---|---|
+| [001 — Separate frontend, API, application, infrastructure and composition](001-layer-boundaries.md) | Accepted |
+| [002 — Google Sheets authority and annual workbook routing](002-sheets-authority-and-year-routing.md) | Accepted |
+| [003 — Google authentication and spreadsheet access](003-google-authentication-and-access.md) | Proposed |
+| [004 — Vercel hosting and portable deployment](004-vercel-and-portability.md) | Accepted |
+| [005 — Mobile-local preferences](005-mobile-local-preferences.md) | Accepted |
+| [006 — TDD and feature-scoped changes](006-tdd-and-feature-scope.md) | Accepted |
 
----
-
-## When to write an ADR
-
-Write a new ADR when a decision:
-
-- Constrains future work in a non-obvious way ("we will never X because Y").
-- Picks one of several reasonable alternatives, where the alternative is plausible enough that someone might re-litigate it later.
-- Touches multiple components, layers, or stacks.
-- Trades off something the team is likely to want back later (performance, simplicity, optionality).
-
-You do **not** need an ADR for:
-
-- Local implementation choices inside a single module.
-- Conventions already captured in `CLAUDE.md` tripwires or methodology recipes.
-- Decisions that can be reversed without ripple effects.
-
----
-
-## Format
-
-Copy [`_template.md`](./_template.md) → `adr/NNN-short-kebab-title.md` and fill in:
-
-- **Status** — `Proposed` | `Accepted` | `Superseded by NNN` | `Deprecated`
-- **Context** — what is the issue we are deciding on?
-- **Decision** — what did we decide?
-- **Consequences** — what becomes easier or harder because of this decision?
-
-Keep ADRs short. One screen is plenty. Long ADRs become read-once artifacts that nobody opens again.
-
----
-
-## Numbering
-
-- `NNN` is zero-padded three-digit, monotonically increasing: `001`, `002`, …
-- Never reuse a number, even if the ADR is later superseded — supersession is a status, not a deletion.
-- The number is permanent; the title in the filename can change if the decision's framing improves over time.
-
----
-
-## Index
-
-| ADR | Title | Status |
-|-----|-------|--------|
-| _(none yet — copy `_template.md` and add the first one)_ | | |
-
-> Bootstrap note: do not invent ADRs from a code scan. Wait for the first real architectural decision to be made.
+Use [_template.md](_template.md) for future records.
