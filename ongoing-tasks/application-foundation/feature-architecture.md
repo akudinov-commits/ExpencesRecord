@@ -2,7 +2,7 @@
 
 ## 1. Pipeline / Integration
 
-This feature establishes the build/test/delivery foundation for the approved React/TypeScript frontend and Node.js/TypeScript/Fastify backend on Vercel. It does not implement login or expenses. The minimal shells, test harness, boundary checks and host/configuration wiring now exist locally. GitHub/Vercel execution is configured but awaits account access; no Google integration exists.
+This feature establishes the build/test/delivery foundation for the approved React/TypeScript frontend and Node.js/TypeScript/Fastify backend on Vercel. It does not implement login or expenses. The minimal shells, test harness, boundary checks and host/configuration wiring now exist locally. GitHub CI checks pass and the free Vercel project is linked with Node 24. Actual preview delivery is still pending; no Google integration exists.
 
 ```mermaid
 flowchart LR
@@ -17,10 +17,10 @@ flowchart LR
 | Stage | What happens | Where |
 |---|---|---|
 | Decisions | Complete missing interview; confirm tools, paths, baseline and delivery packaging | Step 01; decision records |
-| Workspace and tests | Configure selected tools; make checks runnable before behavior | Step 02; future workspace |
-| Boundaries | Enforce inward source dependencies and prevent FE imports of backend internals | Step 03; future automated checks |
-| Minimal shells | Test first, then build the minimum frontend and portable Fastify shell | Step 04; future application source |
-| Delivery | Run checks before building/deploying a preview; one deployment owner | Step 05; future GitHub/Vercel configuration |
+| Workspace and tests | Configure selected tools; make checks runnable before behavior | Step 02; root npm workspace |
+| Boundaries | Enforce inward source dependencies and prevent FE imports of backend internals | Step 03; tests/architecture and dependency-cruiser |
+| Minimal shells | Test first, then build the minimum frontend and portable Fastify shell | Step 04; apps/web, apps/api and api/index.ts |
+| Delivery | Run checks before building/deploying a preview; one deployment owner | Step 05; .github/workflows/foundation.yml and vercel.json |
 | Handoff | Verify clean-checkout instructions and evidence; update actual project state | Step 06; checks and documentation |
 
 ## 2. Component Diagram
@@ -52,13 +52,13 @@ Development changes enter GitHub checks. No expense data, Google credentials or 
 The selected toolchain runs type/lint/test/boundary checks and builds. A failing required check prevents preview delivery. Test fixtures exercise permitted and forbidden imports. Minimal UI/API behavior is implemented only after meaningful RED has been observed.
 
 ### 3.3 Query / Serving
-React serves the minimum shell; Fastify construction is separate from server startup/host adaptation. Only a minimal health endpoint may be anonymous if its path/response are confirmed in step 01. No business endpoints are introduced. Preview deployment, if executed during later implementation, serves no private data and uses no production Google configuration.
+React serves the minimum shell; Fastify construction is separate from server startup/host adaptation. Only GET /api/health and its framework-provided HEAD are anonymous; the response exposes only status. No business endpoints are introduced. Preview deployment, once verified, serves no private data and uses no production Google configuration.
 
 ## 4. Data Stores Summary
 
 | Store | Technology | Collections / Tables / Indices | Purpose |
 |---|---|---|---|
-| Repository | Existing Git working tree | Planning documents now; source/config only during later implementation | Versioned project foundation |
+| Repository | Existing Git working tree | Planning documents, source, tests and configuration | Versioned project foundation |
 | CI/build output | Toolchain selected in step 01 | Ephemeral test/build artifacts | Verification and deployment preparation |
 | Application database / Sheets | None accessed or created in this feature | None | Expense storage remains a later feature |
 

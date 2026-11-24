@@ -6,15 +6,15 @@ Establish a buildable, testable React/TypeScript and Fastify/TypeScript foundati
 
 ## Scope
 
-- **In scope:** finish the missing bootstrap interview; confirm foundation choices; create the selected workspace/test harness, dependency guards, minimal shells and GitHub/Vercel preview setup during future execution.
-- **Planning now:** record the agreed seven-feature roadmap and scaffold this feature from `ongoing-tasks/_template`, without running the implementation steps.
+- **In scope:** reconcile the missing bootstrap interview; confirm foundation choices; implement the approved workspace/test harness, dependency guards, minimal shells and checked GitHub/Vercel preview delivery.
+- **Execution approval:** the user approved tooling and the code/test tree, then explicitly authorized implementation, verification, merge to main and push. The initial planning-only restriction was superseded by that instruction.
 - **Out of scope:** Google login/access implementation, expense APIs/formulas, spreadsheet reads/writes, preferences, full PWA behavior, production rollout, extra database and paid resources.
 - **Dependencies:** [approved roadmap](readme.md), [architecture](../docs/architecture/overview.md), [ADR 001](../adr/001-layer-boundaries.md), [ADR 004](../adr/004-vercel-and-portability.md) and [ADR 006](../adr/006-tdd-and-feature-scope.md).
 - **Decision gate:** step 01 resolves missing interview/foundation choices. Reuse accepted decisions; do not install unselected tools or silently resolve new architecture. Google access and concurrent writes remain later-feature decisions.
 
 ## Architecture
 
-See [feature-architecture.md](application-foundation/feature-architecture.md) for planned pipeline, components, data flow, stores, extension points and security boundaries. All runtime components remain planned.
+See [feature-architecture.md](application-foundation/feature-architecture.md) for pipeline, components, data flow, stores, extension points and security boundaries. The minimal runtime shells exist; preview verification remains pending.
 
 ## Steps
 
@@ -54,3 +54,9 @@ See [feature-architecture.md](application-foundation/feature-architecture.md) fo
 - Vercel CLI authorization was completed by the user. Created and linked the free personal expences-record project under akudinov-7567. No production deployment was created. Local Vercel packaging encountered Windows symlink permissions in its own builder cache; the actual Vercel build will run on the already approved Linux GitHub runner without changing Windows security settings.
 - Preview-target regression RED: npm test -- --project=tooling tests/delivery/pipeline.test.ts --reporter=dot produced 1 failure/3 passes because deploy did not explicitly specify preview. GREEN after adding --environment=preview and removing token arguments in favor of the CLI's VERCEL_TOKEN environment: 4/4 passed. Full npm run check passed: 35 tests, types/lint, source import checks and both builds.
 - CI credential action blocked by automatic approval review before execution: a 90-day project-scoped Vercel token and its storage in GitHub Actions secrets require the user's explicit scope/lifetime/storage approval. Verified no repository secrets or preview-enable variable were created. Approval is requested separately; no alternate credential path is used to bypass the rejection. Steps 05–06 remain open pending actual checked preview verification.
+
+- 2026-11-24 credential approval supersedes the earlier review blocker: the user explicitly approved a non-expiring token limited to expences-record, secure storage as VERCEL_TOKEN in this repository's Actions secrets, and preview enablement. The CLI login session cannot create access tokens (Vercel 403); authenticated dashboard setup was used instead, as documented by Vercel. No sign-in credential was repurposed for CI.
+- Delivery account evidence: GitHub run 45426963086 passed checks on 9fb4b83 (35 tests, types/lint, source boundaries and both builds): https://github.com/akudinov-commits/ExpencesRecord/actions/runs/45426963086. Vercel project inspection confirms Node 24.x. VERCEL_ORG_ID and VERCEL_PROJECT_ID are stored in Actions secrets.
+- Credential handling: the first one-time key value was unavailable after its dialog closed, so the user authorized replacement and revocation. That unused key was revoked. Its replacement was saved to VERCEL_TOKEN, but a premature browser-state observation included the submitting field's value in tool output. Rotation was requested immediately; automatic approval review requires specific approval for revoking this newer key. Preview enablement remains off until this is resolved. No credential values belong in this record.
+- Documentation reconciliation is nonbehavioral: refreshed actual source/CI/account status without marking steps 05-06 complete. Verify links, instruction mirror and bootstrap structure; no new behavior RED/GREEN is claimed for documentation or the Node-version platform alignment.
+- 2026-11-24 rotation resolved: the user specifically approved revoking the exposed replacement. Its deletion was verified in Vercel; a clean project-scoped No Expiration replacement was transferred directly into the encrypted GitHub secret. GitHub confirmed Secret updated. Browser observations were redacted before output, and no replacement value was written to disk, arguments, repository or chat. Both superseded keys are revoked. The preview-enable variable is now true; actual checked deployment remains to be verified.

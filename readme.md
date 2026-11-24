@@ -7,7 +7,7 @@ The initial product will let you select date, amount, category and currency, add
 ## Current state
 The application foundation is implemented: a minimal accessible React shell, portable Fastify construction, validated local startup configuration and anonymous `GET /api/health` returning only `{"status":"ok"}`. There are no expense, login or Google integration endpoints yet. Application and infrastructure directories are reserved without speculative business code. Shared contracts will be added when needed.
 
-Local checks and an isolated clean-checkout install/build pass, including 34 tests. GitHub CI and opt-in Vercel preview configuration exist; remote execution still requires authentication/project setup. Do not treat a local build as a verified deployment. Track current verification/blockers in the [foundation checklist](ongoing-tasks/application-foundation-checklist.md).
+Local checks pass with 35 tests, and an isolated clean-checkout install/build was reproduced. GitHub CI checks and build-artifact upload pass on feature/application-foundation. The free Vercel project is linked with Node 24; preview deployment verification is still pending. Do not treat a local build as a verified deployment. Track current verification/blockers in the [foundation checklist](ongoing-tasks/application-foundation-checklist.md).
 
 ## Code and tests
 | Path | Responsibility |
@@ -40,7 +40,7 @@ Individual checks: `npm run typecheck`, `npm run lint`, `npm test`, `npm run che
 ## Delivery setup
 GitHub's Foundation workflow checks pushes to `main`/`feature/**` and pull requests. Required checks run before preview delivery; forks do not get deployment credentials. Vercel's Git-based automatic deployments are disabled in `vercel.json` so GitHub Actions is the single deployment owner. This feature configures previews only; production rollout belongs to feature 7.
 
-After creating the user's personal Vercel Hobby account, sign in with the pinned Vercel CLI (`npm exec --yes --package=vercel@66.6.0 -- vercel login`), then link the repository root to the intended project. Its static output is `apps/web/dist`; root `api/index.ts` serves `/api/*`. Do not add Google credentials or financial data to previews.
+The user's personal Vercel Hobby account and expences-record project are configured. For a new machine, sign in with the pinned Vercel CLI (`npm exec --yes --package=vercel@66.6.0 -- vercel login`), then link the repository root to the intended project. Its static output is `apps/web/dist`; root `api/index.ts` serves `/api/*`. Do not add Google credentials or financial data to previews.
 
 Configure GitHub Actions secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` through secure account tooling, then set repository variable `VERCEL_PREVIEW_ENABLED=true`. Never paste tokens into commits or chat. Feature-branch pushes or a manually requested preview run check/build/deploy the same commit and verify its health through authenticated Vercel CLI access. Missing credentials fail the enabled preview job explicitly; the disabled flag means no deployment was attempted.
 
