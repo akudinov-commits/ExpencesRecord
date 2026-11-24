@@ -37,3 +37,11 @@ test('one Vercel project serves static UI and API without parallel Git deploymen
   expect(config.git?.deploymentEnabled).toBe(false);
   expect(config.rewrites).toEqual([{ source: '/api/:path*', destination: '/api/index' }]);
 });
+
+test('deployment explicitly targets preview and keeps credentials out of CLI arguments', () => {
+  const commands = (pipeline.jobs?.preview?.steps ?? []).map((step) => step.run ?? '').join('\n');
+  const deploy = commands.split('\n').find((line) => line.includes('vercel deploy '));
+  expect(deploy).toContain('--environment=preview');
+  expect(commands).not.toMatch(/--prod(?:\s|$)|--environment(?:=|\s+)production/);
+  expect(commands).not.toContain('--token');
+});
