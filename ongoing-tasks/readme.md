@@ -10,7 +10,7 @@ Approved by the user on 2026-11-24. The order below is the agreed high-level pla
 
 | Order | Feature | Intended result | Status |
 |---|---|---|---|
-| 1 | [Application foundation and delivery](application-foundation-checklist.md) | React/TypeScript and Fastify foundations, separated layers, runnable tests/import guards, GitHub checks and prepared Vercel preview delivery | Planning scaffold; implementation not started |
+| 1 | [Application foundation and delivery](application-foundation-checklist.md) | React/TypeScript and Fastify foundations, separated layers, runnable tests/import guards, GitHub checks and prepared Vercel preview delivery | Implemented locally; remote verification/account setup pending |
 | 2 | Google login and private access | Google sign-in/logout, single-user authorization and approved server-side Sheets access; explicitly design session/CSRF and public login/callback exceptions | Approved roadmap only |
 | 3 | Spreadsheet mapping and configuration | Read categories/currencies; map dates/months/cells and currency-rate references; configure annual workbooks including user-created 2027 workbook | Approved roadmap only |
 | 4 | Safe expense registration backend | Application-owned validation, additive formula-preserving writes and truthful outcomes; resolve concurrency, duplicates and ambiguous writes before production use | Approved roadmap only |
@@ -23,8 +23,8 @@ Cross-feature rules: TDD for every behavior change; HTTP-only controllers; appli
 Implementation prerequisites: complete the missing bootstrap interview and confirm foundation choices in feature 1 step 01. Google flow/access decisions belong to feature 2; actual sheet mappings to feature 3; safe concurrent/idempotent writes to feature 4. Do not treat roadmap approval as approval of unselected libraries or mechanisms.
 
 ## Current features
-- [Application foundation and delivery](application-foundation-checklist.md) — planning scaffold only; all execution steps unchecked.
-- [Repository bootstrap](repository-bootstrap-checklist.md) — documents applied; structural checks passed; formal interview remains incomplete and is addressed before implementation in foundation step 01. Bootstrap inputs remain for review.
+- [Application foundation and delivery](application-foundation-checklist.md) — steps 01–04 complete locally; delivery/account prerequisites remain open.
+- [Repository bootstrap](repository-bootstrap-checklist.md) — documents applied; structural checks passed; the previously missing tooling/layout interview topic was reconciled through explicit user approval in foundation step 01. Bootstrap inputs remain for review.
 
 ## Templates
 [_template/_template-checklist.md](_template/_template-checklist.md) and [_template/_template/feature-architecture.md](_template/_template/feature-architecture.md) are generic examples. Copy and adapt them; do not copy illustrative links to files that do not exist. The current project rules override template examples.

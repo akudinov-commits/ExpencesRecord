@@ -1,7 +1,7 @@
 # ExpencesRecord architecture
 
 ## Purpose and scope
-Private single-user, mobile-first iPhone PWA. Record date, amount, category and currency into an existing annual Google spreadsheet. Repeated entries add to an existing day/category expression. Conversion and totals remain in Sheets; preferences for categories/currencies stay on mobile. No app implementation exists yet.
+Private single-user, mobile-first iPhone PWA. Record date, amount, category and currency into an existing annual Google spreadsheet. Repeated entries add to an existing day/category expression. Conversion and totals remain in Sheets; preferences for categories/currencies stay on mobile. The foundation implements only the React shell, Fastify health and host/configuration wiring; no expense or Google behavior exists yet.
 
 ## Boundaries and dependencies
 ```mermaid
@@ -47,9 +47,13 @@ The registration flow is conceptual, not an implemented endpoint contract. No en
 ## Authentication and deployment
 Google login and single-user backend authorization are required. Exact OIDC/session/CSRF and Sheets access mechanisms remain Proposed in [ADR 003](../../adr/003-google-authentication-and-access.md). Service account access with keyless federation is a candidate; no cloud resources or credentials exist.
 
-Vercel is selected. Keep Fastify app construction separate from its hosting adapter and configuration, and keep Google SDKs behind application ports. That permits another Node host without moving business policy. Exact FE/BE packaging, GitHub pipeline and production gates remain deferred; no workflow is installed.
+Vercel is selected. Keep Fastify app construction separate from its hosting adapter and configuration, and keep Google SDKs behind application ports. That permits another Node host without moving business policy. The approved foundation packaging uses static output apps/web/dist plus thin root api/index.ts with /api rewrites in one Vercel project. GitHub Actions owns checked preview delivery; automatic Git deployments are disabled. Actual remote execution needs user account setup and remains separately verified in the checklist. Production rollout is feature 7.
 
 ## Verification and next decisions
-Application unit tests use fake ports; API tests exercise real HTTP mapping with Fastify injection; adapters get contract/integration checks; frontend behavior gets interaction tests; import boundaries require an automated check in the future foundation. All behavior starts with observed failing tests. No runner or test command is selected yet.
+Application unit tests use fake ports; API tests exercise real HTTP mapping with Fastify injection; adapters get contract/integration checks; frontend behavior gets interaction tests; dependency-cruiser now provides automated source import checks. All behavior starts with observed failing tests. Vitest/Testing Library and dependency-cruiser are installed; npm run check runs types, lint, tests, boundary checks and builds. Application and infrastructure remain empty reserved layers until actual use cases/adapters are approved.
 
 Implement tooling, auth, supported formula policy and concurrency controls only through approved feature plans. See [ADRs](../../adr/readme.md) and [bootstrap decisions](../../ongoing-tasks/_bootstrap/decisions.md).
+
+
+## Implemented foundation map
+`apps/web/src` contains the static React shell. `apps/api/src/api` contains health HTTP mapping; `bootstrap` constructs Fastify and validates local configuration; `server.ts` is local startup. Root `api/index.ts` only adapts Node request/response to that Fastify instance. No application policy or Google adapter is invented for health. Tests live outside src and are exercised from a clean checkout; deliberate forbidden-import fixtures are not production modules. Only health (GET and framework-provided HEAD) is anonymous; there are no business/login endpoints.

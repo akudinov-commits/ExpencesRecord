@@ -4,4 +4,4 @@ Read and follow [CLAUDE.md](CLAUDE.md), the canonical project rules, then [promp
 
 Changes beyond a simple 2–3-line mechanical edit require a named feature checklist, architecture and steps under `ongoing-tasks/` before work. Behavior changes always require that feature and observed RED → GREEN → refactor evidence, regardless of size. Follow the approved FE/API/application/infrastructure boundaries and Accepted ADRs.
 
-This repository currently contains documentation only. Do not invent app paths, installed tooling, test results or credentials. Application implementation needs its own approved feature scope.
+The application foundation is implemented; read readme.md and package.json for actual paths and commands. Run npm run check for affected changes and record RED/GREEN evidence. Google and expense implementation require their own approved features. Do not invent credentials or remote verification results.

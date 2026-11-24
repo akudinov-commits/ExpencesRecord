@@ -10,7 +10,7 @@ Read [session-start.md](session-start.md), [CLAUDE.md](../CLAUDE.md), the featur
 Beyond one simple mechanical edit totaling at most three changed lines, work must belong to a named feature. Every behavior/security/architecture/dependency/formula/deployment change requires a feature regardless of size. Verify scope and dependencies before editing. Do not split work to evade tracking.
 
 ## Current tooling
-No application test runner, package manager, build command or source structure exists yet. Select and install the harness through an approved foundation feature. The only existing repository check is PowerShell `./scripts/verify-bootstrap.ps1 -RepoRoot .`; it does not test application behavior.
+Node 24.22.3 / npm 11.19.1; install with `npm ci`. Run `npm run typecheck`, `npm run lint`, `npm test`, `npm run check:boundaries`, `npm run build`, or all through `npm run check`. Vitest runs web (jsdom/Testing Library), API (Node/Fastify injection) and architecture/delivery suites. PowerShell 7 is required for bootstrap-verifier regression tests. `scripts/verify-bootstrap.ps1` checks structure, not application behavior or TDD chronology. Actual remote CI/preview execution must be verified separately.
 
 ## Classification
 Classify by effect, not filename or label:

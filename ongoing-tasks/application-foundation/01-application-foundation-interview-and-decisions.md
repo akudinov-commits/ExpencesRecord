@@ -42,4 +42,4 @@ cross-cutting / documentation
 - [React recipe](../../docs/methodology/react-ui.md)
 - [Bootstrap interview prompt](../../prompts/bootstrap/02-interview.md)
 - [Current bootstrap inputs](../_bootstrap/decisions.md)
-- Depends on: no implementation step; the user has authorized planning documents only.
+- Depends on: no earlier implementation step. The initial planning-only restriction was superseded by the user’s later tooling/tree approval and explicit execution/merge/push request; see checklist Notes.

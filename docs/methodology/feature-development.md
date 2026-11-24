@@ -12,7 +12,7 @@ Read [task-workflow.md](task-workflow.md), the approved feature checklist/archit
 
 Use this cycle for every behavior change including fixes, UI interaction, authentication, API/controllers, application rules, adapters and configuration with behavioral effects. Do not write implementation first then backfill tests.
 
-Pure documentation/mechanical/type-only/visual-only work uses appropriate checks, with a recorded reason TDD is not applicable; see [execution protocol](../../prompts/execution.md). Classification never exempts behavior from TDD. No test harness exists yet: create it in the approved foundation step before behavior implementation.
+Pure documentation/mechanical/type-only/visual-only work uses appropriate checks, with a recorded reason TDD is not applicable; see [execution protocol](../../prompts/execution.md). Classification never exempts behavior from TDD. The foundation test harness exists: use npm test and npm run check. Add focused tests before implementing each new behavior.
 
 ## Layer checks
 - Application owns policy and ports; test use cases with fake ports.

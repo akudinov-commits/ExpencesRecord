@@ -23,7 +23,7 @@ AGENTS.md                  Codex routing to canonical rules
 readme.md                  product/current state
 ai-workflow.md             human workflow
 ```
-No application source, manifests, tests or CI exist yet. Planned FE/BE modules are not directories to assume present. Frontend tooling, test runners, versions, auth/access, concurrent writes and deployment packaging remain deferred.
+Foundation source exists in apps/web/src and apps/api/src; tests mirror layers outside src, with architecture/delivery suites under tests/. Node 24/npm workspaces and pinned test/build tools are configured. Run npm ci and npm run check. GitHub/Vercel execution still requires account/project setup; read the active checklist for actual results. Google auth/access and concurrent writes remain deferred.
 
 ## Non-negotiables
-No business logic in controllers or infrastructure; no direct Sheets access from FE; no spreadsheet restructuring or credentials in commits; no unapproved architecture/scope; no test-after-implementation behavior work. Do not ask again for decisions already approved. No standalone task summaries, merges or automatic production writes.
+No business logic in controllers or infrastructure; no direct Sheets access from FE; no spreadsheet restructuring or credentials in commits; no unapproved architecture/scope; no test-after-implementation behavior work. Do not ask again for decisions already approved. No standalone task summaries, merges without explicit user instruction or automatic production writes.

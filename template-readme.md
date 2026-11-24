@@ -18,7 +18,7 @@ The approved conversation supplies ExpencesRecord decisions. Inputs are retained
 Preserve `ongoing-tasks/_template/` and `adr/_template.md` as starter examples. Adapt copied examples and link only existing files. Unused .NET/Python application recipes were removed because those stacks are not selected; use [add-stack.md](prompts/add-stack.md) if that changes.
 
 ## Verification
-Run `./scripts/verify-bootstrap.ps1 -RepoRoot .` in PowerShell. It checks bootstrap structure, placeholders and mirrors, not application correctness or TDD chronology. No app source, tests or CI exist yet. A dedicated foundation feature must establish test tooling/import checks before behavior implementation.
+Run `./scripts/verify-bootstrap.ps1 -RepoRoot .` in PowerShell. It checks bootstrap structure, placeholders and mirrors, not application correctness or TDD chronology. The dedicated foundation feature now supplies source, test tooling/import guards and CI configuration. Run npm run check for local verification; consult the checklist for actual remote CI/preview state.
 
 ## Maintenance
 Update canonical rules and their mirror together. Add feature records before nontrivial work, record test/check evidence in checklist Notes and decisions in ADRs. Human review precedes archiving; no separate task summaries. Beyond a simple 2–3-line mechanical edit, every change needs a feature; behavior changes always do regardless of size.

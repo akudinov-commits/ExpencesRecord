@@ -2,7 +2,7 @@
 
 ## 1. Pipeline / Integration
 
-This feature establishes the build/test/delivery foundation for the approved React/TypeScript frontend and Node.js/TypeScript/Fastify backend on Vercel. It does not implement login or expenses. All runtime components below are planned, not existing.
+This feature establishes the build/test/delivery foundation for the approved React/TypeScript frontend and Node.js/TypeScript/Fastify backend on Vercel. It does not implement login or expenses. The minimal shells, test harness, boundary checks and host/configuration wiring now exist locally. GitHub/Vercel execution is configured but awaits account access; no Google integration exists.
 
 ```mermaid
 flowchart LR
@@ -27,21 +27,21 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  FE[Planned React frontend] --> Contracts[Planned wire contracts only when needed]
-  API[Planned Fastify API / controllers] --> APP[Planned application layer / owned ports]
-  INFRA[Planned infrastructure adapters] --> APP
+  FE[New React frontend] --> Contracts[Future wire contracts only when needed]
+  API[New Fastify API / controllers] --> APP[Reserved application layer / future ports]
+  INFRA[Reserved infrastructure / future adapters] --> APP
   API --> Contracts
-  ROOT[Planned composition root] --> API
+  ROOT[New composition root] --> API
   ROOT --> APP
   ROOT --> INFRA
-  Host[Planned thin hosting entry point] --> ROOT
-  CI[Planned GitHub checks] --> FE
+  Host[New thin hosting entry point] --> ROOT
+  CI[Configured GitHub checks] --> FE
   CI --> Host
-  CI --> Boundary[Planned dependency boundary checker]
-  CI --> Vercel[Planned Vercel preview delivery]
+  CI --> Boundary[New dependency boundary checker]
+  CI --> Vercel[Configured Vercel preview delivery]
 ```
 
-Arrows within application code indicate source dependencies. Application must not import Fastify, Google/Vercel SDKs, infrastructure, controllers or environment-loading code. Actual folders/package boundaries and host packaging are decisions for step 01; no diagram box is a claim that source exists today. Do not create speculative use cases, interfaces, Google adapters or DTOs to populate empty layers. Google integrations belong to later features.
+Arrows within application code indicate source dependencies. Application must not import Fastify, Google/Vercel SDKs, infrastructure, controllers or environment-loading code. The user approved the code/test tree: apps/web, apps/api/src/{api,application,infrastructure,bootstrap}, external test folders and thin root api/index.ts. Application/infrastructure are empty reserved directories; shared contracts are not created. Configured GitHub/Vercel boxes do not mean remote execution has passed. Do not create speculative use cases, interfaces, Google adapters or DTOs to populate empty layers. Google integrations belong to later features.
 
 ## 3. Data Flow
 
@@ -74,4 +74,4 @@ Later features add Google identity and Sheets adapters through application-owned
 - Minimal health is the existing anonymous exception. Google login initiation/callback public exceptions must be explicitly defined and approved in feature 2; do not infer a blanket public-route exemption.
 - No private data, workbook identifiers, Google credentials or production secrets in fixtures, client bundles, repository or preview configuration. Do not loosen `.claude` permissions.
 - Composition validates configuration and injects values; application has no environment or I/O access. Controllers/infrastructure contain no business policy.
-- Preview and production contexts remain separate. Production rollout and full Google/session/CSRF verification belong to later features. No cloud changes or deployment are authorized by this planning-only request.
+- Preview and production contexts remain separate. Production rollout and full Google/session/CSRF verification belong to later features. The user subsequently authorized implementation, verified merge and push. This feature permits only checked preview preparation/delivery; production rollout remains feature 7. Account/terms/credential confirmations are completed by the user.

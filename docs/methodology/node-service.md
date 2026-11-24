@@ -2,7 +2,7 @@
 
 
 ## Project-specific — ExpencesRecord (authoritative)
-These approved project rules replace conflicting generic template examples. Node.js/strict TypeScript + Fastify is selected; versions, package manager, runner and physical source paths remain deferred. There is no application code yet.
+These approved project rules replace conflicting generic template examples. Node.js/strict TypeScript + Fastify is selected; the foundation uses Node 24/npm workspaces, TypeScript 6, Vitest and dependency-cruiser. Source is apps/api/src; tests are apps/api/test. Versions are pinned in manifests/lockfile.
 
 - Use API/controllers → application; infrastructure → application-owned ports; composition root → concrete modules. Application imports no Fastify, Google/Vercel SDK, infrastructure or process.env.
 - Controllers only validate transport shape, hand off verified identity, call a use case and map results/status. No expense or authorization decisions there.

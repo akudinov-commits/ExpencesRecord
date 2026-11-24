@@ -11,7 +11,7 @@ arguments:
 - Beyond a simple 2–3-line mechanical edit, require a named feature checklist, architecture and steps. Behavior/security/architecture/dependency/formula/deployment changes need a feature regardless of size. No fragmented changes to bypass tracking.
 - Every behavior change requires observed meaningful RED before implementation, GREEN and refactor/rerun evidence. UI/CONFIG/INFRA classification is no exemption. Pure documentation needs content/structure/link checks with a reason TDD is not applicable.
 - No business policy in controllers or infrastructure; application owns it and its ports. No direct Sheets writes or FX authority in FE. Respect formula/structure preservation and explicit year routing.
-- No app tests, source, manifests or CI exist yet. Do not invent commands or results. If required checks cannot run, report the blocker and leave the step incomplete.
+- Foundation source/tests/manifests and CI configuration exist; use readme.md/package.json for commands and the active checklist for actual remote results. Do not invent results. If required checks cannot run, report the blocker and leave the step incomplete.
 
 
 

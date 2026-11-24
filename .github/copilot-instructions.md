@@ -23,9 +23,9 @@ Plan the full ordered step list with the human before execution. Each title and 
 | Operator prompts | `prompts/readme.md` |
 
 ## Repository state
-ExpencesRecord is a private single-user iPhone PWA for daily expenses in an existing annual Google spreadsheet. React/strict TypeScript FE, Node.js/TypeScript/Fastify BE and Vercel are selected. This is a documentation scaffold: no app source, manifests, tests or deployment pipelines exist yet. Never claim planned paths or tools are installed.
+ExpencesRecord is a private single-user iPhone PWA for daily expenses in an existing annual Google spreadsheet. React/strict TypeScript FE, Node.js/TypeScript/Fastify BE and Vercel are selected. The foundation now contains React/Fastify shells, manifests, tests and checked-preview configuration. Expense and Google functionality are not implemented. Distinguish local verification from actual GitHub/Vercel execution; never invent deployment results.
 
-`adr/` records decisions; `docs/` defines architecture/methodology; `ongoing-tasks/` holds features; `prompts/` holds operators; `scripts/verify-bootstrap.ps1` checks bootstrap structure. Toolchain versions, frontend/test tooling, Google flow and safe concurrent writes remain deferred.
+`adr/` records decisions; `docs/` defines architecture/methodology; `ongoing-tasks/` holds features; `prompts/` holds operators; `scripts/verify-bootstrap.ps1` checks bootstrap structure. Tooling is pinned in package.json/package-lock.json: Node 24, npm workspaces, Vite, Vitest, Testing Library, ESLint and dependency-cruiser. Google flow and safe concurrent writes remain deferred.
 
 ## Mandatory feature gate
 - Anything beyond one simple mechanical edit totaling at most **2–3 changed lines** must have its own named feature under `ongoing-tasks/` before substantive work. Count the whole cohesive change, not each file separately.
@@ -42,7 +42,7 @@ ExpencesRecord is a private single-user iPhone PWA for daily expenses in an exis
 - Toolchain bootstrapping may be needed to make tests runnable; establish the harness in its approved foundation step, then prove behavior RED before production behavior implementation. Do not use a missing harness as a test exemption.
 - Pure documentation, mechanical edits, type-only declarations and visual-only styling with no behavior use appropriate structure/type/build/visual checks; state why TDD is not applicable. If observable behavior is affected, TDD applies irrespective of classification or line count.
 - No discretionary test-skipping exemption for behavior. If tests cannot run, report the blocker and leave the step incomplete. No production financial data as test fixtures.
-- These rules are review gates. Application test automation and import checks must be installed in the future foundation feature; documentation does not itself prove chronology or passing app tests.
+- These rules are review gates. Run npm run check for types, lint, tests, import boundaries and builds. Passing checks do not themselves prove TDD chronology; retain actual RED/GREEN evidence.
 
 ## Backend tripwires
 - Controllers own HTTP validation, verified principal handoff, delegation and result mapping only. No business logic.
@@ -65,3 +65,11 @@ ExpencesRecord is a private single-user iPhone PWA for daily expenses in an exis
 - All non-health endpoints require authentication and application authorization; health exposes minimal information. Exact Google/session/CSRF mechanics require ADR resolution.
 - Structured logging without financial payloads, tokens or credentials. No silent catches masking dependency/configuration failures. No untracked TODO/FIXME or unrelated cleanup.
 - Prefer existing modules and patterns where they obey Accepted ADRs; conflicting legacy/generic examples never override these rules.
+
+
+## Implemented foundation commands
+- Node 24.22.3 / npm 11.19.1; `npm ci` then `npm run check` from the repository root. PowerShell 7 is required for verifier regression tests.
+- FE: `apps/web/src`; BE: `apps/api/src/{api,application,infrastructure,bootstrap}`; local startup: `apps/api/src/server.ts`; Vercel: thin root `api/index.ts`.
+- Tests: `apps/web/test`, `apps/api/test`, `tests/architecture`, `tests/delivery`. Architecture fixtures intentionally contain prohibited imports and are excluded from source compilation/check scans.
+- Only health is exposed. All later business endpoints must be authenticated and application-authorized by default; Google auth is feature 2. No permissive stub guard is present.
+- GitHub/Vercel execution is contingent on the user's account access; current evidence and blockers are in the foundation checklist. Existing explicit user authorization permits merging/pushing this feature once required verification is complete; it does not authorize production deployment.

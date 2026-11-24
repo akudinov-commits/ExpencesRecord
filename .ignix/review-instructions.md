@@ -13,4 +13,4 @@ Use CLAUDE.md, Accepted ADRs and the authoritative project-specific recipes. Fla
 - Keep CLAUDE and Copilot byte-identical; no missing actual step links or mid-execution scope changes. Preserve templates as examples; human review precedes archive.
 
 ## Exceptions and current state
-Pure documentation, mechanical edits, type-only declarations and visual-only styling without behavior use appropriate checks; this is not a test-skipping exception for behavior. No application tests, CI or source exist yet. No additional project exceptions are approved. Automated checks and import guards belong in a dedicated foundation feature; these review instructions alone do not prove chronology.
+Pure documentation, mechanical edits, type-only declarations and visual-only styling without behavior use appropriate checks; this is not a test-skipping exception for behavior. Foundation source, tests, import guards and CI configuration exist; run npm run check. Actual remote CI/deployment remains separately verified in the checklist. No additional project exceptions are approved; these review instructions alone do not prove chronology.
