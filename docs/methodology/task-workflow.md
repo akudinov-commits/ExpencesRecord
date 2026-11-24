@@ -4,6 +4,14 @@
 
 ---
 
+## Feature gate
+
+Beyond one simple mechanical edit totaling at most 2–3 changed lines, create a named feature before substantive work. Count the entire cohesive change across files; never split work to evade the threshold. Every behavior, security, architecture, dependency, formula or deployment change requires a feature regardless of size. An existing active feature can cover only its already-approved cohesive scope; unrelated changes need their own feature.
+
+Each feature follows mandatory TDD for behavior and records exact RED/GREEN/refactor evidence in checklist Notes. Pure documentation/mechanical/type-only/visual-only changes use appropriate checks and explain why TDD does not apply. A missing harness is not a behavior exemption; establish it in an approved foundation step first.
+
+Existing user authorization counts: routine decomposition of a clearly requested scope does not require repeated permission. New scope and architectural choices still require agreement. See [execution protocol](../../prompts/execution.md).
+
 **One feature = one checklist + one folder of granular steps.** The checklist is the single source of truth. There is no separate `plan.md`.
 
 ---
@@ -72,7 +80,7 @@ Free-form log of decisions, blockers, links to PRs. Dated entries preferred (YYY
 
 Rules:
 - Use GitHub task-list syntax: `- [ ]` / `- [x]`.
-- Each top-level item links to its step file.
+- Each detailed top-level item links to its existing step file. An agreed step not yet detailed stays unlinked and marked `(planned · detail written before execution)`; never link to a missing file.
 - Sub-bullets (`- [ ]` nested) handle granularity below a step — do NOT create a new step file for every sub-task.
 - Mark `[x]` as soon as the step's acceptance criteria are met and tested.
 
@@ -80,7 +88,7 @@ Rules:
 
 ## Step file template
 
-One step = one cohesive, testable unit of work. If a step grows past ~150 lines or sprouts multiple acceptance clusters, split it.
+One step = one cohesive, testable unit of work. If a step grows past ~150 lines or sprouts multiple acceptance clusters, propose a plan change before splitting it; do not change scope during execution without agreement.
 
 ```markdown
 # {NN} — {Feature Name} — {Short Title}
@@ -138,7 +146,7 @@ The full template is `ongoing-tasks/_template/_template/feature-architecture.md`
 2. **Execute**
    - Agent reads the checklist, then `{feature-name}/feature-architecture.md`.
    - Agent picks the next unticked step, opens the step file.
-   - Agent implements → writes/updates tests → ticks the checklist item.
+   - Agent writes and runs a test to observe meaningful RED → implements minimally → observes GREEN → refactors → reruns affected checks → records evidence → ticks the checklist item. This applies to every behavior change regardless of CODE/UI/CONFIG/INFRA labels.
    - Agent does **not** edit the step file's scope mid-flight except to correct factual mistakes.
    - **The agent never invents, adds, splits, merges, reorders, or re-scopes steps during execution, and never moves scope between steps.** If execution shows the plan is wrong or incomplete — a step is missing, a step's scope is off, a new feature or cross-cutting tool is needed — **STOP and agree the change with the human first**, then update the checklist. Plan changes are a shared, explicit decision, never autonomous (same hard gate as architectural decisions).
    - Never edit a completed step's scope; a follow-up step is added only as an agreed plan change.
@@ -149,7 +157,7 @@ The full template is `ongoing-tasks/_template/_template/feature-architecture.md`
    - Broader / architectural decisions → new ADR in `adr/NNN-*.md` (then link from the checklist).
 
 4. **Complete**
-   - When every top-level item is `[x]`, move the checklist and the step folder into `ongoing-tasks/archive/`.
+   - When every top-level item is `[x]` and human review approves completion, move the checklist and the step folder together into `ongoing-tasks/archive/`. Until review, leave the completed feature visible in active tasks.
    - Git history is the audit trail; do not add a summary commit beyond the usual.
 
 5. **Abandon / supersede**

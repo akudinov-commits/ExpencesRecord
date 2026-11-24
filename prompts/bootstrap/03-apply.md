@@ -35,7 +35,7 @@ You are running BOOTSTRAP PHASE 3 — APPLY.
 
 1. Apply factual placeholders from `discovery.md` across all template files.
 
-2. Apply tripwires from `decisions.md` to `CLAUDE.md` (and mirror to `.github/copilot-instructions.md`). Replace each `<<TRIPWIRE_N>>` placeholder with the accepted tripwire text. Delete unused `<<TRIPWIRE_N>>` rows.
+2. Apply tripwires from `decisions.md` to `CLAUDE.md` (and mirror to `.github/copilot-instructions.md`). Replace each double-angle placeholder named `TRIPWIRE_N` with the accepted tripwire text. Delete unused tripwire placeholder rows.
 
 3. For each `docs/methodology/<stack>.md` stub, apply the action from `decisions.md`:
    - **KEEP-AS-IS**: leave the file untouched.
@@ -52,7 +52,7 @@ You are running BOOTSTRAP PHASE 3 — APPLY.
    - Project name (from `decisions.md` § Project identity)
    - One-line description
    - One-paragraph description
-   - Pointer line: "For the AI-coding workflow this repo follows, see [template-readme.md](template-readme.md) and [ai-workflow.md](ai-workflow.md)."
+   - Pointer line (literal content for the generated root README): `For the AI-coding workflow this repo follows, see [template-readme.md](template-readme.md) and [ai-workflow.md](ai-workflow.md).`
 
    If `readme.md` already exists, leave it alone — never overwrite the project's own readme.
 

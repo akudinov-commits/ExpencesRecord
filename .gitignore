@@ -1,2 +1,16 @@
 # Local drafts that are not part of the template (training notes, personal docs)
 /_local/
+
+
+# Local application dependencies, builds, deployment state and test output
+node_modules/
+dist/
+coverage/
+.vercel/
+test-results/
+playwright-report/
+
+# Secrets stay local; sanitized examples may be committed
+.env
+.env.*
+!.env.example

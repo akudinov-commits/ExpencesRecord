@@ -6,6 +6,15 @@ arguments:
     required: true
 ---
 
+## ExpencesRecord project gate
+- Follow CLAUDE.md and Accepted ADRs. Existing conversation/ADR approvals remain valid; do not ask for them again.
+- Beyond a simple 2–3-line mechanical edit, require a named feature checklist, architecture and steps. Behavior/security/architecture/dependency/formula/deployment changes need a feature regardless of size. No fragmented changes to bypass tracking.
+- Every behavior change requires observed meaningful RED before implementation, GREEN and refactor/rerun evidence. UI/CONFIG/INFRA classification is no exemption. Pure documentation needs content/structure/link checks with a reason TDD is not applicable.
+- No business policy in controllers or infrastructure; application owns it and its ports. No direct Sheets writes or FX authority in FE. Respect formula/structure preservation and explicit year routing.
+- No app tests, source, manifests or CI exist yet. Do not invent commands or results. If required checks cannot run, report the blocker and leave the step incomplete.
+
+
+
 # Checklist Audit
 
 > Reference this file with the checklist path:
@@ -76,7 +85,7 @@ For any step that touches infrastructure-as-code (Helm, Terraform, CDK, Pulumi, 
 ### E. Test Coverage
 
 - Count total tests related to this initiative.
-- For CODE steps, verify TDD was followed: each behavior should have at least one test.
+- For every behavior change, including UI/config/auth/adapters, verify recorded test identifiers, exact RED commands and intended failures before implementation, then GREEN and refactor/rerun results in checklist Notes. Test count, coverage or a final passing suite alone cannot prove TDD; flag missing evidence rather than assuming chronology.
 - Run all tests for the affected components and report pass / fail counts.
   - Use the test commands declared in `prompts/execution.md` § Test Frameworks.
   - For initiatives that span multiple components, run each separately and report a per-component tally. Do not aggregate into a single number that hides which component is broken.

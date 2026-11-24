@@ -1,34 +1,30 @@
-# ongoing-tasks/
+# Ongoing tasks
 
-Active work orders. **One feature = one checklist + one steps folder.**
+Every change beyond a simple 2–3-line mechanical edit gets a named feature here before work. Every behavior/security/architecture/dependency/formula/deployment change needs one regardless of size. One cohesive feature may cover many files; do not fragment changes to bypass the rule.
 
-## TL;DR
+Use [task-workflow.md](../docs/methodology/task-workflow.md): `{feature}-checklist.md` + `{feature}/feature-architecture.md` + ordered `NN-{feature}-<short-kebab>.md` specifications. Plan the scope upfront, link only existing steps, record TDD/check evidence in checklist Notes, and obtain human review before archiving. No separate plan or task summary.
 
-- `{feature-name}-checklist.md` is the **single source of truth** for an initiative (goal, scope, step links, notes).
-- `{feature-name}/` holds granular, self-contained step files: `NN-{feature-name}-<short-kebab>.md`.
-- `{feature-name}/feature-architecture.md` is the feature's mental model — read at the start of every step.
-- No separate `plan.md`. The checklist *is* the plan.
-- Completed or superseded work moves to `archive/`.
+## Agreed initial-scope roadmap
 
-## System prompts
+Approved by the user on 2026-11-24. The order below is the agreed high-level plan; only feature 1 is scaffolded. Each later feature gets its own template-based checklist, architecture and steps when authorized. No separate `plan.md` is used.
 
-All operator prompts (execution, audit, bootstrap, session-start, etc.) live in [`prompts/`](../prompts/). The two most relevant for ongoing-tasks work:
+| Order | Feature | Intended result | Status |
+|---|---|---|---|
+| 1 | [Application foundation and delivery](application-foundation-checklist.md) | React/TypeScript and Fastify foundations, separated layers, runnable tests/import guards, GitHub checks and prepared Vercel preview delivery | Planning scaffold; implementation not started |
+| 2 | Google login and private access | Google sign-in/logout, single-user authorization and approved server-side Sheets access; explicitly design session/CSRF and public login/callback exceptions | Approved roadmap only |
+| 3 | Spreadsheet mapping and configuration | Read categories/currencies; map dates/months/cells and currency-rate references; configure annual workbooks including user-created 2027 workbook | Approved roadmap only |
+| 4 | Safe expense registration backend | Application-owned validation, additive formula-preserving writes and truthful outcomes; resolve concurrency, duplicates and ambiguous writes before production use | Approved roadmap only |
+| 5 | Daily expense entry interface | Select date, amount, category and currency; submit, receive confirmation/actionable errors and quickly enter another expense | Approved roadmap only |
+| 6 | Mobile preferences | Remember preferred categories/currencies locally on mobile; no desktop/server synchronization | Approved roadmap only |
+| 7 | iPhone PWA and release readiness | Home Screen installation, safe areas, light/dark appearance, update handling, complete authenticated-flow verification and production delivery | Approved roadmap only |
 
-| Prompt | Purpose |
-|--------|---------|
-| [`prompts/execution.md`](../prompts/execution.md) | TDD cycle, task classification, reporting format. The AI follows this when executing any step. |
-| [`prompts/audit-checklist.md`](../prompts/audit-checklist.md) | Post-implementation audit. Run against a finished or in-progress checklist to detect drift, missing tests, dead code, broken wiring. |
+Cross-feature rules: TDD for every behavior change; HTTP-only controllers; application-owned business policy and ports; mechanical infrastructure adapters; unchanged spreadsheet structure/formulas/formatting; controlled fixtures/test workbook before production verification. No transaction history, reporting, offline submission queue, spreadsheet redesign or additional database in the initial scope.
 
-## Starting a new initiative
+Implementation prerequisites: complete the missing bootstrap interview and confirm foundation choices in feature 1 step 01. Google flow/access decisions belong to feature 2; actual sheet mappings to feature 3; safe concurrent/idempotent writes to feature 4. Do not treat roadmap approval as approval of unselected libraries or mechanisms.
 
-1. Copy `_template/_template-checklist.md` → `{feature-name}-checklist.md`.
-2. Copy `_template/_template/` → `{feature-name}/`.
-3. Rename every occurrence of `_template` / `feature-name` in filenames and inside the files.
-4. Fill in `{feature-name}/feature-architecture.md` first (pipeline, components, data flow).
-5. Write Goal + Scope in the checklist; write at least step `01` in detail.
+## Current features
+- [Application foundation and delivery](application-foundation-checklist.md) — planning scaffold only; all execution steps unchecked.
+- [Repository bootstrap](repository-bootstrap-checklist.md) — documents applied; structural checks passed; formal interview remains incomplete and is addressed before implementation in foundation step 01. Bootstrap inputs remain for review.
 
-## Full conventions
-
-See **[`docs/methodology/task-workflow.md`](../docs/methodology/task-workflow.md)** for templates, naming rules, lifecycle, and relationship to ADRs.
-
-See **[`docs/methodology/feature-development.md`](../docs/methodology/feature-development.md)** for the generic feature recipe (the "how" of building a step).
+## Templates
+[_template/_template-checklist.md](_template/_template-checklist.md) and [_template/_template/feature-architecture.md](_template/_template/feature-architecture.md) are generic examples. Copy and adapt them; do not copy illustrative links to files that do not exist. The current project rules override template examples.
