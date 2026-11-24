@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Post-bootstrap verification script. Checks that the template was applied correctly.
 .DESCRIPTION
@@ -45,8 +45,25 @@ Write-Host "`nVerify Bootstrap -- $RepoRoot`n" -ForegroundColor Cyan
 Write-Host "-- Structural checks --" -ForegroundColor Cyan
 
 # 1. No <<...>> placeholders outside _template/ folders
-$placeholderHits = Get-ChildItem -Path $RepoRoot -Recurse -File -Include '*.md','*.json','*.yaml','*.yml','*.xml','*.ps1','*.cs','*.csproj','*.py','*.ts','*.js' |
-    Where-Object { $_.FullName -notmatch '[/\\]_template[/\\]' -and $_.FullName -notmatch '[/\\]_bootstrap[/\\]' } |
+function Get-ProjectSourceFiles {
+    param([string]$ProjectRoot)
+    $excludedDirectories = @('.git', 'node_modules', 'dist', 'coverage', '.vercel', 'test-results', 'playwright-report', '_template', '_bootstrap')
+    $extensions = @('.md', '.json', '.yaml', '.yml', '.xml', '.ps1', '.cs', '.csproj', '.py', '.ts', '.tsx', '.js', '.cjs', '.mjs')
+    $directories = [System.Collections.Generic.Queue[string]]::new()
+    $directories.Enqueue($ProjectRoot)
+    while ($directories.Count -gt 0) {
+        $directory = $directories.Dequeue()
+        foreach ($item in (Get-ChildItem -LiteralPath $directory -Force)) {
+            if ($item.PSIsContainer) {
+                if ($item.Name -notin $excludedDirectories) { $directories.Enqueue($item.FullName) }
+            } elseif ($item.Extension -in $extensions) {
+                Write-Output $item
+            }
+        }
+    }
+}
+
+$placeholderHits = Get-ProjectSourceFiles -ProjectRoot $RepoRoot |
     ForEach-Object {
         $content = Get-Content $_.FullName -Raw -ErrorAction SilentlyContinue
         if ($content -and $content -match '<<[A-Z_]+>>') {

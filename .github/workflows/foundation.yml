@@ -1,0 +1,71 @@
+name: Foundation
+
+on:
+  push:
+    branches: [main, 'feature/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_preview:
+        description: Deploy a preview after checks
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: foundation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci --no-fund
+      - run: npm run check
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: foundation-build
+          path: |
+            apps/web/dist
+            apps/api/dist
+          if-no-files-found: error
+
+  preview:
+    needs: [checks]
+    if: >-
+      vars.VERCEL_PREVIEW_ENABLED == 'true' &&
+      ((github.event_name == 'push' && startsWith(github.ref, 'refs/heads/feature/')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_preview))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: Require preview configuration
+        run: |
+          test -n "$VERCEL_TOKEN" && test -n "$VERCEL_ORG_ID" && test -n "$VERCEL_PROJECT_ID"
+      - run: npm ci --no-fund
+      - name: Build and deploy checked preview
+        run: |
+          npm exec --yes --package=vercel@66.6.0 -- vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+          npm exec --yes --package=vercel@66.6.0 -- vercel build --token="$VERCEL_TOKEN"
+          deployment_url=$(npm exec --yes --package=vercel@66.6.0 -- vercel deploy --prebuilt --token="$VERCEL_TOKEN")
+          npm exec --yes --package=vercel@66.6.0 -- vercel curl /api/health --deployment "$deployment_url" --token="$VERCEL_TOKEN" > health.json
+          node --input-type=module -e "import {readFileSync} from 'node:fs'; import assert from 'node:assert/strict'; assert.deepEqual(JSON.parse(readFileSync('health.json', 'utf8')), {status:'ok'});"
+          printf 'Preview: %s\n' "$deployment_url" >> "$GITHUB_STEP_SUMMARY"

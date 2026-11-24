@@ -46,3 +46,18 @@ The reusable Apply prompt scaffolds Proposed ADRs only. The user's later explici
 - Select Vercel packaging and GitHub pipeline; use one deployment owner to avoid duplicate deployments. No workflow or cloud resources are created here.
 - Inspect actual workbook mappings, formulas, currency/rate references and annual rollover in a later read-only feature. Do not hardcode identifiers from the conversation.
 - User review precedes deleting _bootstrap inputs and archiving the completed feature.
+
+
+## Foundation interview reconciliation — 2026-11-24
+- Identity, scope, React/TypeScript, Fastify/TypeScript, Vercel, layers, spreadsheet preservation, mobile-local preferences and existing ADR subjects were answered in the earlier discussion and approved plan. Reuse those answers rather than restart the interview.
+- The user explicitly approved the proposed tooling/layout, requested the complete code/test folder tree, then approved proceeding with that tree. This closes the missing stacks/service-inventory topic for this foundation.
+- Confirmed: Node 24 LTS, npm workspaces, React + Vite, Fastify, Vitest + React Testing Library, ESLint and dependency-cruiser. FE is apps/web; BE is apps/api/src/{api,application,infrastructure,bootstrap}; tests mirror layers outside src. Root api/index.ts is a thin Vercel adapter. Shared contracts are added only when actually needed.
+- Existing tripwires/recipes/architecture remain the user-approved constraints: no business logic in controllers/infrastructure; inward application ports; TDD; protected business endpoints; no spreadsheet redesign or new database. No additional review exceptions are introduced (the interview prompt's default is none). Node/React recipes remain active; .NET/Python are not application stacks.
+- Foundation detail within the approved scope: a static accessible ExpencesRecord shell; GET /api/health returns only {"status":"ok"}; no business/login endpoints. Local startup reads required HOST/PORT through bootstrap config. Google identity/session/CSRF and public callback exceptions remain feature-2 decisions.
+- Delivery detail: one Vercel project serves static FE plus the thin Node API function under /api. GitHub Actions owns preview delivery after required checks; disable automatic Git-based deployment to avoid a parallel bypass. No production deployment in this feature. Actual preview needs the user's Vercel project/account configuration; missing credentials are reported, never replaced with fabricated IDs.
+- Compatible pins checked against official npm registry metadata: Node 24.22.3 / npm 11.19.1, React 19.3.1, Vite 8.3.8, Fastify 5.12.8, Vitest 5.1.1, TypeScript 6.0.3. TypeScript 7 is deliberately not selected because typescript-eslint 8.74.0 requires TypeScript <6.1. All dependencies will be pinned in the lockfile.
+- Exact commands: npm ci; npm run typecheck; npm run lint; npm test; npm run check:boundaries; npm run build; npm run check. Their implementation is step 02 onward; no test results are asserted here.
+- The user's execution request explicitly authorizes a separate branch, merge into main after verification, and push to origin. It supersedes earlier planning-only/no-commit restrictions. Completed feature files remain active until completion review; no automatic archiving is implied.
+
+## Interview provenance and limits
+The earlier bootstrap did not conduct a separate seven-question chat interview. This reconciliation records the existing answers plus the user's explicit tooling/tree approval; it does not invent additional human answers or claim that separate questions were asked. No pending Google/expense decisions are silently accepted.
