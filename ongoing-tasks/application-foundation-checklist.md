@@ -2,19 +2,19 @@
 
 ## Goal
 
-Establish a buildable, testable React/TypeScript and Fastify/TypeScript foundation with enforced layer dependencies and checked GitHub/Vercel preview delivery. Current status: implementation in progress on feature/application-foundation.
+Establish a buildable, testable React/TypeScript and Fastify/TypeScript foundation with enforced layer dependencies and checked GitHub/Vercel preview delivery. Current status: implementation and verification complete; retained for human completion review.
 
 ## Scope
 
 - **In scope:** reconcile the missing bootstrap interview; confirm foundation choices; implement the approved workspace/test harness, dependency guards, minimal shells and checked GitHub/Vercel preview delivery.
 - **Execution approval:** the user approved tooling and the code/test tree, then explicitly authorized implementation, verification, merge to main and push. The initial planning-only restriction was superseded by that instruction.
-- **Out of scope:** Google login/access implementation, expense APIs/formulas, spreadsheet reads/writes, preferences, full PWA behavior, production rollout, extra database and paid resources.
+- **Out of scope:** Google login/access implementation, expense APIs/formulas, spreadsheet reads/writes, preferences, full PWA behavior, product production rollout, extra database and paid resources. The user later approved one foundation-only Production initialization with domain assignment skipped, solely to unlock Vercel Preview deployments; see Notes and ADR 004.
 - **Dependencies:** [approved roadmap](readme.md), [architecture](../docs/architecture/overview.md), [ADR 001](../adr/001-layer-boundaries.md), [ADR 004](../adr/004-vercel-and-portability.md) and [ADR 006](../adr/006-tdd-and-feature-scope.md).
 - **Decision gate:** step 01 resolves missing interview/foundation choices. Reuse accepted decisions; do not install unselected tools or silently resolve new architecture. Google access and concurrent writes remain later-feature decisions.
 
 ## Architecture
 
-See [feature-architecture.md](application-foundation/feature-architecture.md) for pipeline, components, data flow, stores, extension points and security boundaries. The minimal runtime shells exist; preview verification remains pending.
+See [feature-architecture.md](application-foundation/feature-architecture.md) for pipeline, components, data flow, stores, extension points and security boundaries. The minimal runtime shells and checked Preview delivery are implemented and verified.
 
 ## Steps
 
@@ -22,8 +22,8 @@ See [feature-architecture.md](application-foundation/feature-architecture.md) fo
 - [x] [02 — Establish workspace and runnable test harness](application-foundation/02-application-foundation-workspace-and-test-harness.md): configure the approved workspace and runnable checks before production behavior.
 - [x] [03 — Enforce architecture dependency boundaries](application-foundation/03-application-foundation-dependency-boundaries.md): prove permitted/forbidden imports with automated checks and recorded RED/GREEN evidence.
 - [x] [04 — Build minimal frontend and portable backend shells](application-foundation/04-application-foundation-minimal-application-shells.md): test first, then create only the approved React/Fastify shells and minimal health if agreed.
-- [ ] [05 — Prepare checked GitHub and Vercel preview delivery](application-foundation/05-application-foundation-github-and-vercel-delivery.md): run required checks before a single preview deployment path; verify actual delivery state.
-- [ ] [06 — Verify foundation and document implementation handoff](application-foundation/06-application-foundation-verify-and-handoff.md): reproduce checks, reconcile documentation and hand off for review before archiving.
+- [x] [05 — Prepare checked GitHub and Vercel preview delivery](application-foundation/05-application-foundation-github-and-vercel-delivery.md): run required checks before a single preview deployment path; verify actual delivery state.
+- [x] [06 — Verify foundation and document implementation handoff](application-foundation/06-application-foundation-verify-and-handoff.md): reproduce checks, reconcile documentation and hand off for review before archiving.
 
 ## Notes
 
@@ -60,3 +60,10 @@ See [feature-architecture.md](application-foundation/feature-architecture.md) fo
 - Credential handling: the first one-time key value was unavailable after its dialog closed, so the user authorized replacement and revocation. That unused key was revoked. Its replacement was saved to VERCEL_TOKEN, but a premature browser-state observation included the submitting field's value in tool output. Rotation was requested immediately; automatic approval review requires specific approval for revoking this newer key. Preview enablement remains off until this is resolved. No credential values belong in this record.
 - Documentation reconciliation is nonbehavioral: refreshed actual source/CI/account status without marking steps 05-06 complete. Verify links, instruction mirror and bootstrap structure; no new behavior RED/GREEN is claimed for documentation or the Node-version platform alignment.
 - 2026-11-24 rotation resolved: the user specifically approved revoking the exposed replacement. Its deletion was verified in Vercel; a clean project-scoped No Expiration replacement was transferred directly into the encrypted GitHub secret. GitHub confirmed Secret updated. Browser observations were redacted before output, and no replacement value was written to disk, arguments, repository or chat. Both superseded keys are revoked. The preview-enable variable is now true; actual checked deployment remains to be verified.
+- 2026-11-24 first-deployment exception explicitly approved by the user: Vercel rejected Preview for a project without deployments (run 45439865216 attempt 1). Initialized once from clean checkout 85b917e using vercel deploy --prod --skip-domain --yes, with a remote Vercel build. Vercel reported READY, target production, productionUrl null and Vercel Authentication protection. This is only a foundation initialization, not an expense release; no ongoing production path was added to GitHub Actions. Subsequent delivery stays preview-only.
+- Run 45439865216 attempt 2 built and deployed the Preview successfully but its health check received Vercel Authentication instead of application JSON. The check correctly failed rather than reporting a healthy app. Vercel CLI configured its documented project-scoped Protection Bypass for Automation for the approved authenticated checks; its value was not printed or committed. A fresh checked preview build is running so that the project access setting is applied. Deployment Protection remains enabled; no public exception was added.
+- Final local npm run check at this revision passed: 35 tests across 7 suites, strict types/lint, 13-module/13-dependency import-boundary checks and both builds. Source review confirms only GET/HEAD health; application and infrastructure remain empty reserved directories. Expense, Google auth, spreadsheet access, preferences and PWA behavior remain named later features.
+
+- Step 05 complete: GitHub run 45439865216 attempt 3 passed both checks and Preview deployment, including the exact protected health response assertion {status:'ok'}: https://github.com/akudinov-commits/ExpencesRecord/actions/runs/45439865216. Verified Preview: https://expences-record-4mdx1sfxq-akudinov-7567.vercel.app. GitHub Actions remains the single normal deployment owner, with automatic Git deployments disabled and explicit Preview targeting. The non-expiring project-scoped CI token and project identifiers are in encrypted Actions secrets; the enable variable is true.
+- Step 06 complete: the live Preview rendered the expected ExpencesRecord heading and shell text in an authenticated browser; screenshot retained for the handoff. Latest local checks pass with 35 tests: frontend 1, API/config 16, architecture/delivery/verifier 18. The clean-checkout reproduction and GitHub clean-runner install/build evidence are recorded above. Source and artifact review found no business/Google endpoints, policy in controllers/infrastructure, financial fixtures or client credentials. All 157 local Markdown links resolve, instruction mirrors match, and the bootstrap verifier reports 11 passes, 1 intentional retained-input cleanup warning, 0 failures. Documentation-only reconciliation needs these content/structure checks rather than application RED/GREEN.
+- Completion is presented for human review; the checklist/folder pair and bootstrap inputs remain in place pending that review. Features 2-7 remain roadmap entries. The user's explicit instruction authorizes the verified feature merge to main and push; ordinary main pushes run quality checks without a production deployment.

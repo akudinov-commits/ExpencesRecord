@@ -2,7 +2,7 @@
 
 ## 1. Pipeline / Integration
 
-This feature establishes the build/test/delivery foundation for the approved React/TypeScript frontend and Node.js/TypeScript/Fastify backend on Vercel. It does not implement login or expenses. The minimal shells, test harness, boundary checks and host/configuration wiring now exist locally. GitHub CI checks pass and the free Vercel project is linked with Node 24. Actual preview delivery is still pending; no Google integration exists.
+This feature establishes the build/test/delivery foundation for the approved React/TypeScript frontend and Node.js/TypeScript/Fastify backend on Vercel. It does not implement login or expenses. The minimal shells, test harness, boundary checks and host/configuration wiring now exist locally. GitHub CI checks, checked Vercel Preview delivery and protected health verification pass with Node 24. The deployed frontend shell was verified in the browser; no Google integration exists.
 
 ```mermaid
 flowchart LR

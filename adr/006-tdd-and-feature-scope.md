@@ -13,4 +13,4 @@ Every behavior change, including fixes, follows observed RED → minimal impleme
 Documentation-only changes use structural/content checks rather than invented unit tests. A feature may cover multiple cohesive files; it is not one feature per file. Review must reject missing feature/TDD evidence. Automated tests and import checks will be installed in a future foundation feature; documentation alone cannot prove test ordering.
 
 ## Implementation status — 2026-11-24
-The foundation now includes runnable Vitest/Testing Library tests and dependency-cruiser checks. Actual RED/GREEN evidence is recorded in its checklist; test presence or final pass counts still do not prove chronological TDD. Remote CI/account setup remains a separately reported completion gate.
+The foundation now includes runnable Vitest/Testing Library tests and dependency-cruiser checks. Actual RED/GREEN evidence is recorded in its checklist; test presence or final pass counts still do not prove chronological TDD. Actual remote CI and protected Preview results are separately recorded in the foundation checklist; local test results alone do not establish them.

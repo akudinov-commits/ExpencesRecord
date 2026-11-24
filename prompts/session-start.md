@@ -23,7 +23,7 @@ AGENTS.md                  Codex routing to canonical rules
 readme.md                  product/current state
 ai-workflow.md             human workflow
 ```
-Foundation source exists in apps/web/src and apps/api/src; tests mirror layers outside src, with architecture/delivery suites under tests/. Node 24/npm workspaces and pinned test/build tools are configured. Run npm ci and npm run check. GitHub CI passes and the Vercel project is linked; actual preview verification remains pending. Read the active checklist for current evidence. Google auth/access and concurrent writes remain deferred.
+Foundation source exists in apps/web/src and apps/api/src; tests mirror layers outside src, with architecture/delivery suites under tests/. Node 24/npm workspaces and pinned test/build tools are configured. Run npm ci and npm run check. GitHub CI, checked Vercel Preview delivery and protected health verification pass. Read the active checklist for current evidence and the approved one-time project initialization exception. Google auth/access and concurrent writes remain deferred.
 
 ## Non-negotiables
 No business logic in controllers or infrastructure; no direct Sheets access from FE; no spreadsheet restructuring or credentials in commits; no unapproved architecture/scope; no test-after-implementation behavior work. Do not ask again for decisions already approved. No standalone task summaries, merges without explicit user instruction or automatic production writes.
