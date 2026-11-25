@@ -6,12 +6,12 @@ Use [task-workflow.md](../docs/methodology/task-workflow.md): `{feature}-checkli
 
 ## Agreed initial-scope roadmap
 
-Approved by the user on 2026-11-24. The order below is the agreed high-level plan; features 1 and 2 are scaffolded. Feature 1 is complete; feature 2 is a planning scaffold for review. Each later feature gets its own template-based checklist, architecture and steps when authorized. No separate `plan.md` is used.
+Approved by the user on 2026-11-24. The order below is the agreed high-level plan; features 1 and 2 are implemented. Feature 1 is merged into main; feature 2 is complete on its feature branch with checked Preview and real owner sign-in/logout, pending human review. Each later feature gets its own template-based checklist, architecture and steps when authorized. No separate `plan.md` is used.
 
 | Order | Feature | Intended result | Status |
 |---|---|---|---|
 | 1 | [Application foundation and delivery](application-foundation-checklist.md) | React/TypeScript and Fastify foundations, separated layers, runnable tests/import guards, GitHub checks and prepared Vercel preview delivery | Complete; merged/pushed to main with verified CI and protected Preview; retained for review |
-| 2 | [Google login and private access](google-login-private-access-checklist.md) | Google sign-in/logout, single-user authorization and approved server-side Sheets access; explicitly design session/CSRF and public login/callback exceptions | Scaffolded for review; all steps unchecked; ADR 003 remains Proposed |
+| 2 | [Google login and private access](google-login-private-access-checklist.md) | Google sign-in/logout, single-user authorization and approved server-side Sheets access; explicitly design session/CSRF and public login/callback exceptions | All seven steps complete; Accepted ADR 003 implemented; checked Preview and real owner sign-in/logout verified; retained for review on the feature branch |
 | 3 | Spreadsheet mapping and configuration | Read categories/currencies; map dates/months/cells and currency-rate references; configure annual workbooks including user-created 2027 workbook | Approved roadmap only |
 | 4 | Safe expense registration backend | Application-owned validation, additive formula-preserving writes and truthful outcomes; resolve concurrency, duplicates and ambiguous writes before production use | Approved roadmap only |
 | 5 | Daily expense entry interface | Select date, amount, category and currency; submit, receive confirmation/actionable errors and quickly enter another expense | Approved roadmap only |
@@ -20,10 +20,10 @@ Approved by the user on 2026-11-24. The order below is the agreed high-level pla
 
 Cross-feature rules: TDD for every behavior change; HTTP-only controllers; application-owned business policy and ports; mechanical infrastructure adapters; unchanged spreadsheet structure/formulas/formatting; controlled fixtures/test workbook before production verification. No transaction history, reporting, offline submission queue, spreadsheet redesign or additional database in the initial scope.
 
-Foundation interview/tooling choices were reconciled in feature 1 step 01. Feature 2 starts by approving the unresolved Google design before implementation. Google flow/access decisions belong to feature 2; actual sheet mappings to feature 3; safe concurrent/idempotent writes to feature 4. Do not treat roadmap approval as approval of unselected libraries or mechanisms.
+Foundation interview/tooling choices were reconciled in feature 1 step 01. Feature 2 resolved its Google design in Accepted ADR 003 before implementation. Google flow/access decisions belong to feature 2; actual sheet mappings to feature 3; safe concurrent/idempotent writes to feature 4. Do not treat roadmap approval as approval of unselected libraries or mechanisms.
 
 ## Current features
-- [Google login and private access](google-login-private-access-checklist.md) — seven planned steps scaffolded for review; no implementation started.
+- [Google login and private access](google-login-private-access-checklist.md) — all seven steps complete on feature/google-login-private-access; CI/Preview, real owner sign-in/logout and controlled read-only Sheets probe verified; retained for human review, not merged.
 - [Application foundation and delivery](application-foundation-checklist.md) — all six steps complete, merged/pushed to main; CI and checked Preview verified; retained for completion review.
 - [Repository bootstrap](repository-bootstrap-checklist.md) — documents applied; structural checks passed; the previously missing tooling/layout interview topic was reconciled through explicit user approval in foundation step 01. Bootstrap inputs remain for review.
 

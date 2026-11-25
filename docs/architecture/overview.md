@@ -1,7 +1,7 @@
 # ExpencesRecord architecture
 
 ## Purpose and scope
-Private single-user, mobile-first iPhone PWA. Record date, amount, category and currency into an existing annual Google spreadsheet. Repeated entries add to an existing day/category expression. Conversion and totals remain in Sheets; preferences for categories/currencies stay on mobile. The foundation is verified. The active auth feature locally implements the React sign-in shell, Google identity verification, application-owned single-user/session policy, protected Fastify routes and separate read-only Sheets operator setup. Real owner/grant/refresh and the authorized blank-workbook ID-only probe have passed; hosted Preview verification remains pending; no expense endpoints or writes exist.
+Private single-user, mobile-first iPhone PWA. Record date, amount, category and currency into an existing annual Google spreadsheet. Repeated entries add to an existing day/category expression. Conversion and totals remain in Sheets; preferences for categories/currencies stay on mobile. The foundation is verified. The active auth feature locally implements the React sign-in shell, Google identity verification, application-owned single-user/session policy, protected Fastify routes and separate read-only Sheets operator setup. Real owner/grant/refresh and the authorized blank-workbook ID-only probe have passed; checked hosted Preview delivery and anonymous/security checks have passed; real owner browser sign-in/logout has passed; all authentication feature steps are complete pending human review; no expense endpoints or writes exist.
 
 ## Boundaries and dependencies
 ```mermaid
