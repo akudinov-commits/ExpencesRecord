@@ -21,7 +21,10 @@
     "test:watch": "vitest",
     "check:boundaries": "depcruise --config .dependency-cruiser.cjs --output-type err apps/web/src apps/api/src api",
     "build": "npm run build --workspaces --if-present",
-    "check": "npm run typecheck && npm run lint && npm test && npm run check:boundaries && npm run build"
+    "check": "npm run typecheck && npm run lint && npm test && npm run check:boundaries && npm run build",
+    "setup:google:owner": "node --env-file-if-exists=.env --import tsx apps/api/src/setup-google.ts owner",
+    "setup:google:sheets": "node --env-file=.env --import tsx apps/api/src/setup-google.ts sheets",
+    "check:google:sheets": "node --env-file=.env --import tsx apps/api/src/setup-google.ts probe"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

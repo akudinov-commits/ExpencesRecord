@@ -1,0 +1,1 @@
+export { EncryptJWT } from 'jose';

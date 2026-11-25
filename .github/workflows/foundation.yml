@@ -51,6 +51,7 @@ jobs:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      AUTH_PREVIEW_ALIAS: ${{ vars.VERCEL_AUTH_PREVIEW_ALIAS }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -68,4 +69,5 @@ jobs:
           deployment_url=$(npm exec --yes --package=vercel@66.6.0 -- vercel deploy --prebuilt --environment=preview)
           npm exec --yes --package=vercel@66.6.0 -- vercel curl /api/health --deployment "$deployment_url" > health.json
           node --input-type=module -e "import {readFileSync} from 'node:fs'; import assert from 'node:assert/strict'; assert.deepEqual(JSON.parse(readFileSync('health.json', 'utf8')), {status:'ok'});"
+          node --import tsx scripts/assign-auth-preview.ts "$deployment_url"
           printf 'Preview: %s\n' "$deployment_url" >> "$GITHUB_STEP_SUMMARY"
