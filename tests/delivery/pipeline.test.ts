@@ -45,3 +45,10 @@ test('deployment explicitly targets preview and keeps credentials out of CLI arg
   expect(commands).not.toMatch(/--prod(?:\s|$)|--environment(?:=|\s+)production/);
   expect(commands).not.toContain('--token');
 });
+
+test('the authentication alias is assigned only after the checked deployment passes protected health verification', () => {
+  const command = (pipeline.jobs?.preview?.steps ?? []).map(step => step.run ?? '').find(run => run.includes('scripts/assign-auth-preview.ts'));
+  expect(command).toBeDefined();
+  expect(command?.indexOf('scripts/assign-auth-preview.ts')).toBeGreaterThan(command?.indexOf('assert.deepEqual') ?? 0);
+  expect(command).toContain('"$deployment_url"');
+});
