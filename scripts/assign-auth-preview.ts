@@ -16,7 +16,8 @@ export function planAuthPreview(input: AuthPreviewInput): { alias: string; deplo
 export function assignAuthPreview(input: AuthPreviewInput, run: (args: string[]) => number | null): void {
   const plan = planAuthPreview(input);
   if (!plan) return;
-  const status = run(['exec', '--yes', '--package=vercel@66.6.0', '--', 'vercel', 'alias', 'set', plan.deploymentUrl, plan.alias]);
+  const endpoint = `/v2/deployments/${new URL(plan.deploymentUrl).hostname}/aliases?slug=akudinov-7567`;
+  const status = run(['exec', '--yes', '--package=vercel@66.6.0', '--', 'vercel', 'api', endpoint, '--method', 'POST', '--raw-field', `alias=${plan.alias}`, '--silent']);
   if (status !== 0) throw new Error('Preview alias assignment failed');
 }
 

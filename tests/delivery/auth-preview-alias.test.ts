@@ -19,10 +19,10 @@ test.each(['expences-record.vercel.app', 'example.com', 'expences-record-auth-pr
 test.each(['http://expences-record-synthetic123-akudinov-7567.vercel.app', 'https://attacker.example', 'https://expences-record-synthetic123-akudinov-7567.vercel.app/path', 'https://expences-record-synthetic123-akudinov-7567.vercel.app/?token=synthetic', 'https://user:password@expences-record-synthetic123-akudinov-7567.vercel.app'])('invalid deployment URL %s is rejected', (deploymentUrl) => {
   expect(() => planAuthPreview({ ...input, deploymentUrl })).toThrow('Invalid checked Preview deployment URL');
 });
-test('uses the pinned alias command with separate validated arguments and no credential flags', () => {
+test('uses the deployment alias API with explicit account scope and no user lookup or credential flags', () => {
   const run = vi.fn(() => 0);
   assignAuthPreview(input, run);
-  expect(run).toHaveBeenCalledExactlyOnceWith(['exec', '--yes', '--package=vercel@66.6.0', '--', 'vercel', 'alias', 'set', input.deploymentUrl, input.alias]);
+  expect(run).toHaveBeenCalledExactlyOnceWith(['exec', '--yes', '--package=vercel@66.6.0', '--', 'vercel', 'api', '/v2/deployments/expences-record-synthetic123-akudinov-7567.vercel.app/aliases?slug=akudinov-7567', '--method', 'POST', '--raw-field', `alias=${input.alias}`, '--silent']);
 });
 test('alias command failure stops delivery rather than reporting a successful stable Preview', () => {
   expect(() => assignAuthPreview(input, () => 1)).toThrow('Preview alias assignment failed');
