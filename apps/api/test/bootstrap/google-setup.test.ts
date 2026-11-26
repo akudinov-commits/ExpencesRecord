@@ -46,3 +46,26 @@ test('Sheets consent and probe composition fail before network I/O when required
   expect(() => createSheetsProbe({})).toThrow('APP_ORIGIN');
   expect(() => createSheetsProbe(authEnvironment)).toThrow('GOOGLE_SHEETS_REFRESH_TOKEN');
 });
+
+test('the separately confirmed write grant updates only its own private setting', async () => {
+  const save = vi.fn<(values: Record<string, string>) => Promise<void>>().mockResolvedValue();
+  expect(await saveGoogleSetupResult({ mode: 'sheets-write', registration, result: { subject: authEnvironment.GOOGLE_ALLOWED_SUBJECT, refreshToken: 'synthetic-write-refresh' }, environment: authEnvironment }, async () => true, save)).toBe(true);
+  expect(save).toHaveBeenCalledExactlyOnceWith({ GOOGLE_SHEETS_WRITE_REFRESH_TOKEN: 'synthetic-write-refresh' });
+});
+test('declining write-grant storage changes no credentials or cookie settings', async () => {
+  const save = vi.fn();
+  expect(await saveGoogleSetupResult({ mode: 'sheets-write', registration, result: { subject: authEnvironment.GOOGLE_ALLOWED_SUBJECT, refreshToken: 'synthetic-write-refresh' }, environment: authEnvironment }, async () => false, save)).toBe(false);
+  expect(save).not.toHaveBeenCalled();
+});
+test('write-consent composition requires the configured owner and explicitly requests only the write grant', async () => {
+  expect(() => createGoogleSetupRuntime('sheets-write', registration)).toThrow('Google owner configuration is required');
+  const { app } = createGoogleSetupRuntime('sheets-write', registration, authEnvironment.GOOGLE_ALLOWED_SUBJECT); opened.push(app);
+  const response = await app.inject({ url: '/', headers: { host: 'localhost:5173' } });
+  expect(response.statusCode).toBe(303);
+  expect(new URL(response.headers.location!).searchParams.get('scope')).toBe('openid email https://www.googleapis.com/auth/spreadsheets');
+});
+test('read-only verification of writer capability uses the separate writer setting', () => {
+  const base = { ...authEnvironment, GOOGLE_TEST_SPREADSHEET_ID: 'synthetic_test_workbook', GOOGLE_SHEETS_REFRESH_TOKEN: 'synthetic-read-refresh' };
+  expect(() => createSheetsProbe(base, 'write')).toThrow('GOOGLE_SHEETS_WRITE_REFRESH_TOKEN');
+  expect(() => createSheetsProbe({ ...base, GOOGLE_SHEETS_WRITE_REFRESH_TOKEN: 'synthetic-write-refresh' }, 'write')).not.toThrow();
+});

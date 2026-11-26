@@ -15,12 +15,12 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import type { SetupCompletion } from '../api/google-setup-server.js';
-export interface SetupInput { mode: 'owner' | 'sheets'; registration: GoogleClientRegistration; result: GoogleSetupResult; environment: NodeJS.ProcessEnv }
+export interface SetupInput { mode: 'owner' | 'sheets' | 'sheets-write'; registration: GoogleClientRegistration; result: GoogleSetupResult; environment: NodeJS.ProcessEnv }
 export async function saveGoogleSetupResult(input: SetupInput, confirm: () => Promise<boolean>, save: (values: Record<string, string>) => Promise<void>): Promise<boolean> {
   if (!await confirm()) return false;
-  if (input.mode === 'sheets') {
+  if (input.mode !== 'owner') {
     if (!input.result.refreshToken) throw new Error('Google setup failed');
-    await save({ GOOGLE_SHEETS_REFRESH_TOKEN: input.result.refreshToken });
+    await save({ [input.mode === 'sheets-write' ? 'GOOGLE_SHEETS_WRITE_REFRESH_TOKEN' : 'GOOGLE_SHEETS_REFRESH_TOKEN']: input.result.refreshToken });
     return true;
   }
   const settings = {
@@ -32,24 +32,26 @@ export async function saveGoogleSetupResult(input: SetupInput, confirm: () => Pr
   await save(settings);
   return true;
 }
-export function createGoogleSetupRuntime(mode: 'owner' | 'sheets', registration: GoogleClientRegistration, allowedSubject?: string) {
+export function createGoogleSetupRuntime(mode: 'owner' | 'sheets' | 'sheets-write', registration: GoogleClientRegistration, allowedSubject?: string) {
   const client = new OAuth2Client({ ...registration, transporterOptions: { timeout: 10000, retry: false } });
-  const consent = new GoogleOperatorConsent(client, registration, systemClock);
+  const consent = new GoogleOperatorConsent(client, { ...registration, sheetsWrite: mode === 'sheets-write' }, systemClock);
   const service = new GoogleSetupService({ mode, ...(allowedSubject ? { allowedSubject } : {}) }, consent, systemClock, secureSecrets);
   return createGoogleSetupApp(service);
 }
-export function createSheetsProbe(environment: NodeJS.ProcessEnv): CheckSheetsAccess {
+export function createSheetsProbe(environment: NodeJS.ProcessEnv, permission: 'read' | 'write' = 'read'): CheckSheetsAccess {
   const auth = parseAuthConfiguration(environment);
-  const sheets = parseSheetsProbeConfiguration(environment);
+  const key = permission === 'write' ? 'GOOGLE_SHEETS_WRITE_REFRESH_TOKEN' : 'GOOGLE_SHEETS_REFRESH_TOKEN';
+  const refreshToken = environment[key]?.trim(); if (!refreshToken) throw new Error(`${key} is required`);
+  const sheets = parseSheetsProbeConfiguration({ ...environment, GOOGLE_SHEETS_REFRESH_TOKEN: refreshToken });
   const client = new OAuth2Client({ clientId: auth.clientId, clientSecret: auth.clientSecret, transporterOptions: { timeout: 10000, retry: false } });
-  const credentials = new GoogleSheetsCredentials(client, { clientId: auth.clientId, refreshToken: sheets.refreshToken }, systemClock);
+  const credentials = new GoogleSheetsCredentials(client, { clientId: auth.clientId, refreshToken: sheets.refreshToken, permission }, systemClock);
   return new CheckSheetsAccess({ allowedSubject: auth.allowedSubject, testSpreadsheetId: sheets.testSpreadsheetId }, credentials, new GoogleSpreadsheetProbe());
 }
 
-export async function runGoogleSetup(mode: 'owner' | 'sheets' | 'probe', environment: NodeJS.ProcessEnv = process.env): Promise<void> {
-  if (mode === 'probe') {
-    await createSheetsProbe(environment).execute();
-    console.log('Read-only test workbook access verified. No grid data was requested.');
+export async function runGoogleSetup(mode: 'owner' | 'sheets' | 'sheets-write' | 'probe' | 'probe-write', environment: NodeJS.ProcessEnv = process.env): Promise<void> {
+  if (mode === 'probe' || mode === 'probe-write') {
+    await createSheetsProbe(environment, mode === 'probe-write' ? 'write' : 'read').execute();
+    console.log(mode === 'probe-write' ? 'Write scope and read-only test workbook metadata access verified. No write or comment was attempted.' : 'Read-only test workbook access verified. No grid data was requested.');
     return;
   }
   let registration: GoogleClientRegistration;
@@ -76,7 +78,7 @@ export async function runGoogleSetup(mode: 'owner' | 'sheets' | 'probe', environ
   const terminal = createInterface({ input: process.stdin, output: process.stdout });
   try {
     const saved = await saveGoogleSetupResult({ mode, registration, result: completion.value, environment }, async () => {
-      const question = mode === 'owner' ? 'Save the Google account you just selected as the app owner? Type YES: ' : 'Save the separate read-only Sheets grant for the configured owner? Type YES: ';
+      const question = mode === 'owner' ? 'Save the Google account you just selected as the app owner? Type YES: ' : mode === 'sheets-write' ? 'Save the separate write-capable Sheets grant only as GOOGLE_SHEETS_WRITE_REFRESH_TOKEN in ignored local .env? Type YES: ' : 'Save the separate read-only Sheets grant for the configured owner? Type YES: ';
       return (await terminal.question(question)).trim() === 'YES';
     }, (values) => saveLocalGoogleSettings(resolve('.env'), values));
     console.log(saved ? 'Google settings saved directly to the ignored local .env file.' : 'Setup canceled. No settings were saved.');

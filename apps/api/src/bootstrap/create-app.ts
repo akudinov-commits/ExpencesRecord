@@ -1,3 +1,5 @@
+import { registerExpenseRoutes } from '../api/routes/expenses.js';
+import type { ExpenseOperations } from '../application/ports/expenses.js';
 import { registerExpenseContextRoutes } from '../api/routes/expense-context.js';
 import type { ExpenseContextQuery } from '../application/expense-context.js';
 import Fastify from 'fastify';
@@ -15,7 +17,7 @@ function safeRequest(value: unknown) {
   return { method: typeof request.method === 'string' ? request.method : '', path: typeof request.url === 'string' ? request.url.split('?')[0] : '' };
 }
 
-export function createApp(options: FastifyServerOptions, dependencies?: AuthHttpDependencies, expenseContext?: ExpenseContextQuery) {
+export function createApp(options: FastifyServerOptions, dependencies?: AuthHttpDependencies, expenseContext?: ExpenseContextQuery, expenses?: ExpenseOperations) {
   const logging = options.logger && typeof options.logger === 'object' ? options.logger : {};
   const app = Fastify({ ...options, logger: options.logger ? { ...logging, serializers: {
     req: safeRequest,
@@ -45,7 +47,7 @@ export function createApp(options: FastifyServerOptions, dependencies?: AuthHttp
     }
   });
   app.addHook('onSend', async (request, reply, payload) => {
-    if (request.routeOptions.url?.startsWith('/api/auth/') || request.routeOptions.url === '/api/expense-context') reply.header('cache-control', 'no-store').header('referrer-policy', 'no-referrer');
+    if (request.routeOptions.url?.startsWith('/api/auth/') || request.routeOptions.url === '/api/expense-context' || request.routeOptions.url?.startsWith('/api/expenses')) reply.header('cache-control', 'no-store').header('referrer-policy', 'no-referrer');
     return payload;
   });
   app.setNotFoundHandler((_request, reply) => reply.code(404).header('cache-control', 'no-store').send({ error: { code: 'not_found' } }));
@@ -71,5 +73,6 @@ export function createApp(options: FastifyServerOptions, dependencies?: AuthHttp
   registerHealthRoutes(app);
   if (dependencies) registerAuthRoutes(app, dependencies);
   if (expenseContext) registerExpenseContextRoutes(app, expenseContext);
+  if (expenses) registerExpenseRoutes(app, expenses);
   return app;
 }

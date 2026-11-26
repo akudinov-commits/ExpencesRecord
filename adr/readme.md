@@ -10,5 +10,6 @@ Accepted records capture decisions already approved by the user. Proposed detail
 | [004 — Vercel hosting and portable deployment](004-vercel-and-portability.md) | Accepted |
 | [005 — Mobile-local preferences](005-mobile-local-preferences.md) | Accepted |
 | [006 — TDD and feature-scoped changes](006-tdd-and-feature-scope.md) | Accepted |
+| [007 — Preview-confirmed expense writes with explicit concurrency limits](007-expense-preview-and-write-limits.md) | Accepted |
 
 Use [_template.md](_template.md) for future records.

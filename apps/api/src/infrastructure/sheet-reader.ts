@@ -78,10 +78,10 @@ export class GoogleSheetReader implements SheetReader {
     }
   }
   async listSheets(spreadsheetId: string, accessToken: string): Promise<SheetMetadata[]> {
-    const result = await this.get(spreadsheetId, accessToken, 'sheets(properties(title,gridProperties(rowCount,columnCount)))');
+    const result = await this.get(spreadsheetId, accessToken, 'sheets(properties(sheetId,title,gridProperties(rowCount,columnCount)))');
     return array(result.sheets, 1000).map(value => {
       const properties = object(object(value).properties); const dimensions = object(properties.gridProperties);
-      return { title: title(text(properties.title, 100)), rowCount: integer(dimensions.rowCount, 1, 10000000), columnCount: integer(dimensions.columnCount, 1, 18278) };
+      return { ...(properties.sheetId === undefined ? {} : { sheetId: integer(properties.sheetId, 0, 2147483647) }), title: title(text(properties.title, 100)), rowCount: integer(dimensions.rowCount, 1, 10000000), columnCount: integer(dimensions.columnCount, 1, 18278) };
     });
   }
   async readCells(spreadsheetId: string, sheetTitle: string, rectangle: Rectangle, accessToken: string): Promise<SheetCell[]> {
