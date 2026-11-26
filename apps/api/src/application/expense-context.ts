@@ -5,7 +5,7 @@ export type MappingFailure = 'invalid_date' | 'year_not_configured' | 'month_not
 export class MappingError extends Error { constructor(public readonly code: MappingFailure) { super(code); } }
 export interface ExpenseContextResult {
   date: string; baseCurrency: string; categories: CategoryBinding[]; currencies: CurrencyBinding[];
-  target: { spreadsheetId: string; sheetTitle: string; row: number };
+  target: { spreadsheetId: string; sheetTitle: string; row: number; sheetId?: number };
 }
 export interface ExpenseContextQuery { execute(subject: string, date: string): Promise<ExpenseContextResult> }
 const invalid = (): never => { throw new MappingError('mapping_invalid'); };
@@ -89,7 +89,7 @@ export class GetExpenseContext implements ExpenseContextQuery {
       }
       return { date, baseCurrency: year.baseCurrency, categories: month.categories.map(category => ({ ...category })),
         currencies: month.currencies.map(currency => ({ code: currency.code, rate: currency.rate ? { ...currency.rate } : null })),
-        target: { spreadsheetId: year.spreadsheetId, sheetTitle: month.sheetTitle, row } };
+        target: { spreadsheetId: year.spreadsheetId, sheetTitle: month.sheetTitle, row, ...(sheet.sheetId !== undefined ? { sheetId: sheet.sheetId } : {}) } };
     } catch (error) {
       if (error instanceof SheetsAccessError) throw new MappingError(error.code === 'unavailable' ? 'sheets_unavailable' : error.code);
       throw error;

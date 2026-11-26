@@ -4,6 +4,7 @@ import type { SheetsCredentials, SpreadsheetProbe } from '../application/ports/s
 import { SheetsAccessError } from '../application/ports/sheets-access.js';
 
 export const READONLY_SHEETS_SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+export const WRITE_SHEETS_SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
 export interface GoogleRefreshClient {
   setCredentials(value: Credentials): void;
   on(event: 'tokens', listener: (value: Credentials) => void): unknown;
@@ -12,7 +13,7 @@ export interface GoogleRefreshClient {
 }
 export class GoogleSheetsCredentials implements SheetsCredentials {
   private replacementRequired = false;
-  constructor(private readonly client: GoogleRefreshClient, private readonly configuration: { refreshToken: string; clientId: string }, private readonly clock: Clock) {
+  constructor(private readonly client: GoogleRefreshClient, private readonly configuration: { refreshToken: string; clientId: string; permission?: 'read' | 'write' }, private readonly clock: Clock) {
     if (!configuration.refreshToken.trim()) throw new SheetsAccessError('reconnect_required');
     client.on('tokens', (tokens) => {
       if (tokens.refresh_token && tokens.refresh_token !== configuration.refreshToken) this.replacementRequired = true;
@@ -25,10 +26,11 @@ export class GoogleSheetsCredentials implements SheetsCredentials {
       const { token } = await this.client.getAccessToken();
       if (this.replacementRequired || !token) throw new SheetsAccessError('reconnect_required');
       const info = await this.client.getTokenInfo(token);
-      const allowedScopes = ['openid', 'email', 'https://www.googleapis.com/auth/userinfo.email', READONLY_SHEETS_SCOPE];
+      const requiredScope = this.configuration.permission === 'write' ? WRITE_SHEETS_SCOPE : READONLY_SHEETS_SCOPE;
+      const allowedScopes = ['openid', 'email', 'https://www.googleapis.com/auth/userinfo.email', READONLY_SHEETS_SCOPE, ...(this.configuration.permission === 'write' ? [WRITE_SHEETS_SCOPE] : [])];
       if (info.aud !== this.configuration.clientId || typeof info.sub !== 'string' || !/^[\x21-\x7e]{1,255}$/.test(info.sub)
         || !Number.isFinite(info.expiry_date) || info.expiry_date <= this.clock.now() * 1000
-        || !Array.isArray(info.scopes) || !info.scopes.includes(READONLY_SHEETS_SCOPE) || !info.scopes.includes('openid')
+        || !Array.isArray(info.scopes) || !info.scopes.includes(requiredScope) || !info.scopes.includes('openid')
         || info.scopes.some((scope) => !allowedScopes.includes(scope))) throw new SheetsAccessError('reconnect_required');
       return { accessToken: token, subject: info.sub };
     } catch (error) {

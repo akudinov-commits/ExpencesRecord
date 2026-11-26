@@ -7,8 +7,8 @@ export class GoogleSetupService {
   private transaction: LoginTransaction | undefined;
   private started = false;
   private authorizationUrl: string | undefined;
-  constructor(private readonly configuration: { mode: 'owner' | 'sheets'; allowedSubject?: string }, private readonly consent: GoogleSetupConsent, private readonly clock: Clock, private readonly secrets: Secrets) {
-    if (configuration.mode === 'sheets' && !configuration.allowedSubject?.trim()) throw new Error('Google owner configuration is required');
+  constructor(private readonly configuration: { mode: 'owner' | 'sheets' | 'sheets-write'; allowedSubject?: string }, private readonly consent: GoogleSetupConsent, private readonly clock: Clock, private readonly secrets: Secrets) {
+    if (configuration.mode !== 'owner' && !configuration.allowedSubject?.trim()) throw new Error('Google owner configuration is required');
   }
   begin(): string {
     if (this.started) {
@@ -18,7 +18,7 @@ export class GoogleSetupService {
     this.started = true;
     const issuedAt = this.clock.now();
     this.transaction = { state: this.secrets.token(), nonce: this.secrets.token(), verifier: this.secrets.token(), issuedAt, expiresAt: issuedAt + 600 };
-    this.authorizationUrl = this.consent.authorizationUrl(this.transaction, this.configuration.mode === 'sheets');
+    this.authorizationUrl = this.consent.authorizationUrl(this.transaction, this.configuration.mode !== 'owner');
     return this.authorizationUrl;
   }
   async complete(input: { code: string; state: string }): Promise<GoogleSetupResult> {

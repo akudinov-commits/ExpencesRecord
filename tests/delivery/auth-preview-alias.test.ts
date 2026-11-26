@@ -1,10 +1,10 @@
 import { expect, test, vi } from 'vitest';
 import { assignAuthPreview, planAuthPreview } from '../../scripts/assign-auth-preview.js';
-const input = { branchRef: 'refs/heads/feature/spreadsheet-mapping-configuration', alias: 'expences-record-auth-preview.vercel.app', deploymentUrl: 'https://expences-record-synthetic123-akudinov-7567.vercel.app' };
+const input = { branchRef: 'refs/heads/feature/safe-expense-registration-backend', alias: 'expences-record-auth-preview.vercel.app', deploymentUrl: 'https://expences-record-synthetic123-akudinov-7567.vercel.app' };
 test('plans only the explicitly approved authentication Preview alias for this feature', () => {
   expect(planAuthPreview(input)).toEqual({ alias: input.alias, deploymentUrl: input.deploymentUrl });
 });
-test.each(['refs/heads/feature/google-login-private-access', 'refs/heads/main', 'refs/heads/feature/another-feature', 'refs/pull/1/merge'])('branch %s cannot move the auth Preview alias', (branchRef) => {
+test.each(['refs/heads/feature/spreadsheet-mapping-configuration', 'refs/heads/feature/google-login-private-access', 'refs/heads/main', 'refs/heads/feature/another-feature', 'refs/pull/1/merge'])('branch %s cannot move the auth Preview alias', (branchRef) => {
   const run = vi.fn(() => 0);
   expect(planAuthPreview({ ...input, branchRef })).toBeNull();
   expect(assignAuthPreview({ ...input, branchRef }, run)).toBeUndefined();

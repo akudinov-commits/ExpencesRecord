@@ -24,7 +24,9 @@
     "check": "npm run typecheck && npm run lint && npm test && npm run check:boundaries && npm run build",
     "setup:google:owner": "node --env-file-if-exists=.env --import tsx apps/api/src/setup-google.ts owner",
     "setup:google:sheets": "node --env-file=.env --import tsx apps/api/src/setup-google.ts sheets",
-    "check:google:sheets": "node --env-file=.env --import tsx apps/api/src/setup-google.ts probe"
+    "check:google:sheets": "node --env-file=.env --import tsx apps/api/src/setup-google.ts probe",
+    "setup:google:sheets-write": "node --env-file=.env --import tsx apps/api/src/setup-google.ts sheets-write",
+    "check:google:sheets-write": "node --env-file=.env --import tsx apps/api/src/setup-google.ts probe-write"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

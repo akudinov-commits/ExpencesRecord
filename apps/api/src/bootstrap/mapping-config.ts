@@ -1,4 +1,4 @@
-import type { CurrencyBinding, MappingConfiguration, MonthMapping, Rectangle, WorkbookYear } from '../application/ports/workbook.js';
+import type { CategoryBinding, CurrencyBinding, MappingConfiguration, MonthMapping, Rectangle, WorkbookYear } from '../application/ports/workbook.js';
 export class MappingConfigurationError extends Error { constructor() { super('Invalid mapping configuration'); } }
 const invalid = (): never => { throw new MappingConfigurationError(); };
 function record(value: unknown, keys: string[]): Record<string, unknown> {
@@ -33,7 +33,7 @@ function rectangle(value: unknown): Rectangle {
   if (end.row < start.row || end.column < start.column || (end.row - start.row + 1) * (end.column - start.column + 1) > 20000) return invalid();
   return { startRow: start.row, endRow: end.row, startColumn: start.column, endColumn: end.column };
 }
-function month(value: unknown, baseCurrency: string): MonthMapping {
+function month(value: unknown, baseCurrency: string, version: number): MonthMapping {
   const v = record(value, ['month', 'sheetTitle', 'range', 'headerRow', 'dateColumn', 'dateRows', 'dateEncoding', 'categories', 'currencies']);
   const range = rectangle(v.range);
   const headerRow = integer(v.headerRow, range.startRow, range.endRow);
@@ -44,10 +44,10 @@ function month(value: unknown, baseCurrency: string): MonthMapping {
   if (dateRows.from > dateRows.to || (headerRow >= dateRows.from && headerRow <= dateRows.to)) return invalid();
   const dateEncoding = v.dateEncoding;
   if (dateEncoding !== 'serial' && dateEncoding !== 'iso' && dateEncoding !== 'day-first') return invalid();
-  const categories = array(v.categories, 200).map(value => {
-    const category = record(value, ['id', 'label', 'column']); const position = column(category.column);
+  const categories = array(v.categories, 200).map<CategoryBinding>(value => {
+    const category = record(value, ['id', 'label', 'column', ...(version === 2 ? ['storageCurrency'] : [])]); const position = column(category.column);
     if (position < range.startColumn || position > range.endColumn || position === dateColumn) return invalid();
-    return { id: string(category.id, 64, /^[a-z][a-z0-9-]*$/), label: string(category.label, 200), column: position };
+    return { id: string(category.id, 64, /^[a-z][a-z0-9-]*$/), label: string(category.label, 200), column: position, ...(version === 2 ? { storageCurrency: string(category.storageCurrency, 3, /^[A-Z]{3}$/) } : {}) };
   });
   distinct(categories.map(category => category.id)); distinct(categories.map(category => category.label)); distinct(categories.map(category => category.column));
   const currencies = array(v.currencies, 200).map<CurrencyBinding>(value => {
@@ -59,13 +59,14 @@ function month(value: unknown, baseCurrency: string): MonthMapping {
     return { code, rate: { sheetTitle: string(rate.sheetTitle, 100), ...cell(rate.cell), operation: rate.operation } };
   });
   distinct(currencies.map(currency => currency.code));
+  if (categories.some(category => category.storageCurrency && !currencies.some(currency => currency.code === category.storageCurrency))) return invalid();
   if (!currencies.some(currency => currency.code === baseCurrency)) return invalid();
   return { month: integer(v.month, 1, 12), sheetTitle: string(v.sheetTitle, 100), range, headerRow, dateColumn, dateRows, dateEncoding, categories, currencies };
 }
-function year(value: unknown): WorkbookYear {
+function year(value: unknown, version: number): WorkbookYear {
   const v = record(value, ['year', 'spreadsheetId', 'baseCurrency', 'months']);
   const baseCurrency = string(v.baseCurrency, 3, /^[A-Z]{3}$/);
-  const months = array(v.months, 12).map(value => month(value, baseCurrency)); distinct(months.map(month => month.month));
+  const months = array(v.months, 12).map(value => month(value, baseCurrency, version)); distinct(months.map(month => month.month));
   return { year: integer(v.year, 1900, 9999), spreadsheetId: string(v.spreadsheetId, 200, /^[A-Za-z0-9_-]{10,200}$/), baseCurrency, months };
 }
 export function parseMappingConfiguration(environment: NodeJS.ProcessEnv): MappingConfiguration {
@@ -73,8 +74,9 @@ export function parseMappingConfiguration(environment: NodeJS.ProcessEnv): Mappi
   if (!raw || raw.length > 200000) return invalid();
   try {
     const v = record(JSON.parse(raw), ['version', 'years']);
-    if (v.version !== 1) return invalid();
-    const years = array(v.years, 100).map(year); distinct(years.map(year => year.year));
+    if (v.version !== 1 && v.version !== 2) return invalid();
+    const version = v.version;
+    const years = array(v.years, 100).map(value => year(value, version)); distinct(years.map(year => year.year));
     return { years };
   } catch (error) {
     if (error instanceof SyntaxError) return invalid();

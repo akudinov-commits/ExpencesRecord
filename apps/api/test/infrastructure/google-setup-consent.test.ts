@@ -5,13 +5,13 @@ import type { GoogleOAuthClient, GoogleTokenResponse } from '../../src/infrastru
 import { READONLY_SHEETS_SCOPE } from '../../src/infrastructure/sheets-access.js';
 import { authFixture, now, owner } from '../support/auth.js';
 
-function fixture() {
+function fixture(sheetsWrite = false) {
   const configuration = { clientId: 'test-client.apps.googleusercontent.com', redirectUri: 'http://localhost:5173/api/auth/callback' };
   const real = new OAuth2Client(configuration.clientId);
   const response: GoogleTokenResponse = { tokens: { id_token: 'synthetic-id', access_token: 'synthetic-access', refresh_token: 'synthetic-refresh' }, res: null };
   const payload = { sub: owner, aud: configuration.clientId, iss: 'https://accounts.google.com', iat: now, exp: now + 3600, nonce: 'bound-nonce' };
   const client = { generateAuthUrl: real.generateAuthUrl.bind(real), getToken: vi.fn<GoogleOAuthClient['getToken']>().mockResolvedValue(response), verifyIdToken: vi.fn<GoogleOAuthClient['verifyIdToken']>().mockResolvedValue(new LoginTicket('', payload)) };
-  return { consent: new GoogleOperatorConsent(client, configuration, { now: () => now }), client, transaction: authFixture().transaction, payload };
+  return { consent: new GoogleOperatorConsent(client, { ...configuration, sheetsWrite }, { now: () => now }), client, transaction: authFixture().transaction, payload };
 }
 test('offline consent requests only approved identity and read-only Sheets scopes with PKCE', () => {
   const { consent, transaction } = fixture();
@@ -38,4 +38,15 @@ test('operator exchange reuses Google identity verification and returns no acces
 test('a nonce mismatch cannot produce a setup result or refresh credential', async () => {
   const { consent, transaction, payload } = fixture(); payload.nonce = 'forged';
   await expect(consent.exchange('code', transaction)).rejects.toThrow('Google identity rejected');
+});
+
+test('explicit write consent requests Sheets write plus identity without Drive access', () => {
+  const { consent, transaction } = fixture(true); const url = new URL(consent.authorizationUrl(transaction, true));
+  expect(url.searchParams.get('scope')?.split(' ')).toEqual(['openid', 'email', 'https://www.googleapis.com/auth/spreadsheets']);
+  expect(url.searchParams.get('access_type')).toBe('offline'); expect(url.searchParams.get('prompt')).toBe('consent');
+  expect(url.searchParams.get('include_granted_scopes')).toBe('false'); expect(url.searchParams.get('code_challenge_method')).toBe('S256');
+});
+test('write-capable operator configuration never broadens ordinary online identity discovery', () => {
+  const { consent, transaction } = fixture(true);
+  expect(new URL(consent.authorizationUrl(transaction, false)).searchParams.get('scope')).toBe('openid email');
 });

@@ -9,7 +9,7 @@ Use CLAUDE.md, Accepted ADRs and the authoritative project-specific recipes. Fla
 - Controllers contain HTTP mechanics only. Application owns all authorization/expense/formula policy and its ports; it imports no Fastify, Google/Vercel SDK, env or infrastructure. Infrastructure performs mechanics only; composition root wires dependencies.
 - Preserve sheet structure/formulas/formats/calculated totals; explicit annual routing; no universal F39 assumption, blind retries, serverless in-memory lock guarantees or unsupported expression writes.
 - No credentials/tokens/private spreadsheet identifiers in code/logs/client; no direct Sheets access/FX authority in FE. Preferences remain mobile-local.
-- Google flow/access follows Accepted ADR 003; actual account/grant/Preview verification must be recorded separately from synthetic tests. Concurrent write design remains unresolved; do not ship inferred implementations. No unapproved libraries or extra database.
+- Google flow/access follows Accepted ADR 003; actual account/grant/Preview verification must be recorded separately from synthetic tests. Expense writes use Accepted ADR 007: preview/recheck with explicit remaining overlap and unknown-outcome limits. Do not claim locking or exactly-once delivery. No unapproved libraries or extra database.
 - Keep CLAUDE and Copilot byte-identical; no missing actual step links or mid-execution scope changes. Preserve templates as examples; human review precedes archive.
 
 ## Exceptions and current state

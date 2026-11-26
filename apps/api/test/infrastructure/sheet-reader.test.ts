@@ -17,7 +17,7 @@ test('lists only neutral sheet titles and dimensions through a bounded metadata-
   const [url, options] = request.mock.calls[0]!; const parsed = new URL(String(url));
   expect(parsed.origin).toBe('https://sheets.googleapis.com');
   expect(parsed.pathname).toBe(`/v4/spreadsheets/${id}`);
-  expect(parsed.searchParams.get('fields')).toBe('sheets(properties(title,gridProperties(rowCount,columnCount)))');
+  expect(parsed.searchParams.get('fields')).toBe('sheets(properties(sheetId,title,gridProperties(rowCount,columnCount)))');
   expect(parsed.searchParams.get('includeGridData')).toBe('false');
   expect(options).toMatchObject({ method: 'GET', headers: { Authorization: `Bearer ${token}` }, redirect: 'error' });
   expect(options?.signal).toBeInstanceOf(AbortSignal); expect(options).not.toHaveProperty('body');
@@ -83,4 +83,13 @@ test.each([['../bad', token], [id, ''], [id, 'bad\r\nheader']])('unsafe resource
 test('response reads are size-bounded even without a Content-Length header', async () => {
   const request = vi.fn<typeof fetch>().mockResolvedValue(new Response('x'.repeat(2 * 1024 * 1024 + 1)));
   await expect(new GoogleSheetReader(request).listSheets(id, token)).rejects.toMatchObject({ code: 'unavailable' });
+});
+
+test('neutral metadata preserves a verified sheet ID of zero for exact cell/comment coordinates', async () => {
+  const { reader } = fixture({ sheets: [{ properties: { sheetId: 0, title, gridProperties: { rowCount: 60, columnCount: 28 } } }] });
+  expect(await reader.listSheets(id, token)).toEqual([{ sheetId: 0, title, rowCount: 60, columnCount: 28 }]);
+});
+test.each([-1, 0.5, '0', 2147483648])('malformed provider sheet ID %s is unavailable', async sheetId => {
+  const { reader } = fixture({ sheets: [{ properties: { sheetId, title, gridProperties: { rowCount: 60, columnCount: 28 } } }] });
+  await expect(reader.listSheets(id, token)).rejects.toMatchObject({ code: 'unavailable' });
 });

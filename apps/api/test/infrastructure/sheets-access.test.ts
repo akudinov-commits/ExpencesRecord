@@ -5,7 +5,7 @@ import type { GoogleRefreshClient } from '../../src/infrastructure/sheets-access
 import { now } from '../support/auth.js';
 
 const clientId = 'test-client.apps.googleusercontent.com';
-function fixture() {
+function fixture(permission: 'read' | 'write' = 'read') {
   let listener: (value: Credentials) => void = () => {};
   const info: TokenInfo = { aud: clientId, sub: 'verified-subject', expiry_date: (now + 3600) * 1000, scopes: ['openid', 'https://www.googleapis.com/auth/userinfo.email', READONLY_SHEETS_SCOPE] };
   const client = {
@@ -14,7 +14,7 @@ function fixture() {
     getAccessToken: vi.fn<GoogleRefreshClient['getAccessToken']>().mockResolvedValue({ token: 'synthetic-access' }),
     getTokenInfo: vi.fn<GoogleRefreshClient['getTokenInfo']>().mockResolvedValue(info),
   };
-  const provider = new GoogleSheetsCredentials(client, { refreshToken: 'synthetic-refresh', clientId }, { now: () => now });
+  const provider = new GoogleSheetsCredentials(client, { refreshToken: 'synthetic-refresh', clientId, permission }, { now: () => now });
   return { provider, client, info, emit: (value: Credentials) => listener(value) };
 }
 test('refresh stays behind the SDK and returns only server-side access plus verified subject', async () => {
@@ -83,4 +83,18 @@ test.each(['{}', '{"spreadsheetId":"different"}', 'not-json'])('invalid probe re
 test('network failure does not expose credential-bearing request details', async () => {
   const request = vi.fn<typeof fetch>().mockRejectedValue(new Error('synthetic-access synthetic_test_id'));
   await expect(new GoogleSpreadsheetProbe(request).check('synthetic_test_id', 'synthetic-access')).rejects.toThrow('unavailable');
+});
+
+test('explicit writer credentials require and accept the granted Sheets write scope', async () => {
+  const f = fixture('write'); f.info.scopes = ['openid', 'email', 'https://www.googleapis.com/auth/spreadsheets'];
+  expect(await f.provider.get()).toEqual({ accessToken: 'synthetic-access', subject: 'verified-subject' });
+});
+test('writer credentials cannot accept a merely read-only grant', async () => {
+  const f = fixture('write'); await expect(f.provider.get()).rejects.toMatchObject({ code: 'reconnect_required' });
+});
+test('writer credentials allow the explicitly approved old read scope alongside write but reject unrelated scopes', async () => {
+  const f = fixture('write'); f.info.scopes.push('https://www.googleapis.com/auth/spreadsheets');
+  expect(await f.provider.get()).toMatchObject({ subject: 'verified-subject' });
+  f.info.scopes.push('https://www.googleapis.com/auth/drive');
+  await expect(f.provider.get()).rejects.toMatchObject({ code: 'reconnect_required' });
 });

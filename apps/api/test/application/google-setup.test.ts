@@ -3,7 +3,7 @@ import { GoogleSetupService } from '../../src/application/google-setup.js';
 import type { GoogleSetupConsent } from '../../src/application/ports/google-setup.js';
 import { now, owner } from '../support/auth.js';
 
-function fixture(mode: 'owner' | 'sheets' = 'owner') {
+function fixture(mode: 'owner' | 'sheets' | 'sheets-write' = 'owner') {
   let time = now; let serial = 0;
   const consent = { authorizationUrl: vi.fn<GoogleSetupConsent['authorizationUrl']>().mockReturnValue('https://accounts.google.com/synthetic-consent'), exchange: vi.fn<GoogleSetupConsent['exchange']>().mockResolvedValue({ subject: owner, refreshToken: 'synthetic-refresh' }) };
   const configuration = { mode, allowedSubject: owner };
@@ -67,4 +67,20 @@ test('a completed or expired setup cannot be reopened to replay its flow', async
   expect(() => completed.service.begin()).toThrow('invalid_callback');
   const expired = fixture(); expired.service.begin(); expired.advance();
   expect(() => expired.service.begin()).toThrow('invalid_callback');
+});
+
+test('write setup requires the existing explicitly configured owner', () => {
+  const f = fixture();
+  expect(() => new GoogleSetupService({ mode: 'sheets-write' }, f.consent, f.clock, f.secrets)).toThrow('Google owner configuration is required');
+});
+test('write setup is a separate owner-bound offline consent flow', async () => {
+  const f = fixture('sheets-write'); f.service.begin();
+  expect(f.consent.authorizationUrl).toHaveBeenCalledWith(expect.any(Object), true);
+  expect(await f.service.complete({ code: 'code', state: 'random-1' })).toEqual({ subject: owner, refreshToken: 'synthetic-refresh' });
+});
+test('write setup rejects another owner and cannot silently accept a grant without refresh', async () => {
+  const wrong = fixture('sheets-write'); wrong.consent.exchange.mockResolvedValue({ subject: 'other-owner', refreshToken: 'other-refresh' }); wrong.service.begin();
+  await expect(wrong.service.complete({ code: 'code', state: 'random-1' })).rejects.toMatchObject({ code: 'access_denied' });
+  const missing = fixture('sheets-write'); missing.consent.exchange.mockResolvedValue({ subject: owner }); missing.service.begin();
+  await expect(missing.service.complete({ code: 'code', state: 'random-1' })).rejects.toThrow('reconnect_required');
 });

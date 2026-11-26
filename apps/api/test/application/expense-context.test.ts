@@ -99,3 +99,8 @@ test('an added currency reads its cross-tab reference without a fixed currency l
   expect(result.currencies.map(currency => currency.code)).toEqual(['KZT', 'AED', 'JPY']);
   expect(f.reader.readCells).toHaveBeenCalledWith('synthetic-workbook-id', 'Synthetic rates', { startRow: 7, endRow: 7, startColumn: 27, endColumn: 27 }, 'synthetic-access');
 });
+
+test('an exact provider sheet ID is retained inward for approved write/comment plans', async () => {
+  const f = fixture(); f.reader.listSheets.mockResolvedValue([{ title: 'Synthetic January', rowCount: 65, columnCount: 30, sheetId: 0 }]);
+  expect((await f.service.execute(owner, requestedDate)).target.sheetId).toBe(0);
+});
