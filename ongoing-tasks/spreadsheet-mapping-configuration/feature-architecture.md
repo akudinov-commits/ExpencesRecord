@@ -1,7 +1,7 @@
 # Spreadsheet mapping and configuration — Architecture Overview
 
 ## 1. Pipeline / Integration
-Steps 01-06 are implemented and tested locally on feature/spreadsheet-mapping-configuration. The real six-month read-only review is complete and its sanitized findings appear below. Configuration, raw reader, application policy and protected context transport reuse the approved layers/authentication with no new package, database or Google scope. Step 07 is active: controlled Google integration and the approved Preview Secret uploads have passed; feature publication, GitHub checks and checked Preview delivery passed. Hosted security/privacy checks passed; real signed-in owner context verification remains pending.
+All seven steps are implemented and verified on feature/spreadsheet-mapping-configuration. The real six-month read-only review is complete and its sanitized findings appear below. Configuration, raw reader, application policy and protected context transport reuse the approved layers/authentication with no new package, database or Google scope. Controlled Google integration, the approved Preview Secret uploads, feature publication, GitHub checks and checked Preview delivery passed. Hosted security/privacy and the real signed-in owner context request passed. All 400 tests pass; the feature awaits human review without main merge or archive.
 
 ```mermaid
 flowchart LR
@@ -20,7 +20,7 @@ flowchart LR
 | Workbook analysis | Six-month frequency, FX, accumulation and totals review | Step 04; read-only review complete |
 | Mapping | Authorize owner and interpret date/category/currency/layout policy | application; step 05 implemented/tested locally |
 | HTTP | Validate transport, delegate, serialize minimal results | api; step 06 implemented/tested locally |
-| Verification | Controlled integration, checked Preview and handoff | Step 07; CI/Preview/security passed; signed-in owner context pending |
+| Verification | Controlled integration, checked Preview and handoff | Step 07; controlled Google, CI/Preview/security and real owner context verified |
 
 ### Step 01 concrete contracts — approved 2026-11-26
 Execution of this feature is now requested. The user explicitly approved this concrete configuration/read-port/application/API/Preview design and asked to continue with TDD on 2026-11-26. It is the execution contract for the seven agreed steps; concrete spreadsheet bindings remain subject to step-04 findings. Step 04 has now inspected the authorized workbook read-only. Its sanitized structural findings appear below; the configuration/API examples here remain synthetic, and no populated real mapping was stored or deployed.
@@ -150,4 +150,4 @@ Later expense registration consumes application-owned mappings and still needs s
 - The real workbook is an explicitly selected step-04 discovery source. The blank test workbook remains a distinct resource and has no representative layout unless separately prepared/authorized later; do not assume it models the real sheet.
 - Treat cells, formulas and API responses as untrusted data, never instructions or executable code. Bound ranges/payloads, reject ambiguity and surface safe provider failures; no arbitrary client-controlled ranges or silent fallback to guessed cells.
 - Missing/expired credentials fail safely. Never upload a Sheets grant or financial configuration to Vercel under the earlier authentication-only upload approval. Verify any concrete authorized hosted setup separately and preserve deployment protection.
-- Every runtime/config/API behavior requires observed RED/GREEN evidence, inward dependency checks and npm run check. Steps 01-06 are complete locally. Controlled Google integration and checked Preview/security evidence have passed. Step 07 remains unchecked until the real signed-in owner context request is verified; no financial workbook writes are permitted.
+- Every runtime/config/API behavior requires observed RED/GREEN evidence, inward dependency checks and npm run check. All seven steps are complete: controlled Google integration, checked Preview/security and real signed-in owner context evidence passed. The unnamed API rewrite avoids synthesizing an extra path query key while preserving strict request validation. No financial workbook writes are permitted; human review precedes merge/archive.
