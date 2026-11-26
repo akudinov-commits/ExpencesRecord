@@ -1,6 +1,6 @@
 # Expense registration operator guide
 
-The backend was implemented on feature/safe-expense-registration-backend and merged into main as 367d72d under explicit user approval on 2026-11-26. Controlled Google tests passed only against the separately authorized synthetic workbook. The user approved Preview-only private writer settings and feature publication on 2026-11-26; the three private settings are stored, commit a94277f is pushed and actual GitHub checks/checked Preview delivery passed. Hosted protected synthetic-session writes/comments and privacy checks passed. The final real-browser save awaits a manual Edge console safety-warning hand-off. The expense-entry UI belongs to feature 5.
+The backend was implemented on feature/safe-expense-registration-backend and merged into main as 367d72d under explicit user approval on 2026-11-26. Controlled Google tests passed only against the separately authorized synthetic workbook. The user approved Preview-only private writer settings and feature publication on 2026-11-26; the three private settings are stored, commit a94277f is pushed and actual GitHub checks/checked Preview delivery passed. Hosted protected synthetic-session writes/comments and privacy checks passed. The final real-browser save/read-back and independent content/format/comment preservation check passed; all five steps are complete and retained for human review. The expense-entry UI belongs to feature 5.
 
 ## Private configuration
 
@@ -37,6 +37,6 @@ The final read detects a changed preview but is not a lock or compare-and-swap. 
 
 ## Verification and delivery
 
-Follow [the active checklist](../ongoing-tasks/safe-expense-registration-backend-checklist.md) for observed RED/GREEN and actual controlled/hosted evidence. Local tests use fake ports and Fastify injection; the isolated Google proof uses real owner grants and an explicitly manufactured local test session, not a claim of interactive hosted sign-in. Live partial-provider failures are not manufactured: those outcomes are contract-tested with fault injection.
+Follow [the active checklist](../ongoing-tasks/safe-expense-registration-backend-checklist.md) for observed RED/GREEN and actual controlled/hosted evidence. Local tests use fake ports and Fastify injection; the isolated Google proof uses real owner grants and an explicitly manufactured local test session, not a claim of interactive hosted sign-in. The separate real-browser proof uses the existing signed-in owner session, previews the synthetic cell, confirms one 4 KZT save with HTTP 201 and verifies the calculated total changed from 722 to 726. No session was manufactured for that browser proof. Live partial-provider failures are not manufactured: those outcomes are contract-tested with fault injection.
 
 Only explicitly approved test cells may be mutated. Preserve source values, formulas, notes, formats and existing comments. Never use the real workbook for tests. Upload writer/mapping/enable settings only after concrete permission, Preview only. Checked GitHub delivery precedes stable-alias reassignment. No main merge, Production release or real-workbook activation is implied.
