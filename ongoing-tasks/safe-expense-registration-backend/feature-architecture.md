@@ -1,7 +1,7 @@
 # Safe expense registration backend — Architecture Overview
 
 ## 1. Pipeline / Integration
-Execution is requested. On 2026-11-26 the user replaced the proposed metadata-based mechanism with previewing the cell, deciding whether to add another expense and warning about possible duplicates. Past-date entries are explicitly required. The metadata/guard/receipt design and its pending approval question are superseded, not accepted. Local implementation, approved owner write consent and isolated synthetic writes/comments are verified; hosted setup/publication remains pending. The five-step order remains unchanged; the revised HTTP/port contracts and limitations are approved by the user on 2026-11-26 and recorded in Accepted ADR 007. Steps 01-04 are locally verified; step 05 has controlled Google evidence and awaits cloud/publication approval and actual hosted checks.
+Execution is requested. On 2026-11-26 the user replaced the proposed metadata-based mechanism with previewing the cell, deciding whether to add another expense and warning about possible duplicates. Past-date entries are explicitly required. The metadata/guard/receipt design and its pending approval question are superseded, not accepted. Local implementation, approved owner write consent and isolated synthetic writes/comments are verified; approved Preview setup, feature push and actual checked delivery are verified; the final real-browser save is pending a manual console safety-warning hand-off. The five-step order remains unchanged; the revised HTTP/port contracts and limitations are approved by the user on 2026-11-26 and recorded in Accepted ADR 007. Steps 01-04 are locally verified; step 05 has controlled Google evidence and has approved Preview setup, successful actual checked delivery and controlled hosted evidence; final real-browser save verification is pending.
 
 ```mermaid
 flowchart LR
@@ -22,7 +22,7 @@ flowchart LR
 | 02 | Stateless preview comparison and protected contracts; explicit concurrency/uncertainty limits | Approved under ADR 007; step 02 complete; no durable coordination |
 | 03 | Owner-approved write grant and isolated fixture configuration | Complete; separate local owner writer grant and exact isolated fixtures verified |
 | 04 | TDD implementation in accepted layers | Complete locally; application, formula, adapters, protected transport and composition verified |
-| 05 | Controlled and checked hosted verification, then handoff | Controlled writes/comments verified; cloud transfer and actual checked Preview pending |
+| 05 | Controlled and checked hosted verification, then handoff | Controlled local/hosted writes/comments and actual checked Preview passed; final real-browser save pending |
 
 ## 2. Component Diagram
 | Component | Existing/new | Responsibility |

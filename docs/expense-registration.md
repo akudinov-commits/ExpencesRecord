@@ -1,6 +1,6 @@
 # Expense registration operator guide
 
-The backend is locally implemented on feature/safe-expense-registration-backend. Controlled Google tests passed only against the separately authorized synthetic workbook. The user approved Preview-only private writer settings and feature publication on 2026-11-26; the three private settings are now stored, and checked publication/hosted verification is in progress. The expense-entry UI belongs to feature 5.
+The backend is locally implemented on feature/safe-expense-registration-backend. Controlled Google tests passed only against the separately authorized synthetic workbook. The user approved Preview-only private writer settings and feature publication on 2026-11-26; the three private settings are stored, commit a94277f is pushed and actual GitHub checks/checked Preview delivery passed. Hosted protected synthetic-session writes/comments and privacy checks passed. The final real-browser save awaits a manual Edge console safety-warning hand-off. The expense-entry UI belongs to feature 5.
 
 ## Private configuration
 
