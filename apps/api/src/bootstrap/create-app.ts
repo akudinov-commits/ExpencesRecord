@@ -1,3 +1,5 @@
+import { registerExpenseContextRoutes } from '../api/routes/expense-context.js';
+import type { ExpenseContextQuery } from '../application/expense-context.js';
 import Fastify from 'fastify';
 import type { FastifyServerOptions } from 'fastify';
 import { registerHealthRoutes } from '../api/routes/health.js';
@@ -13,7 +15,7 @@ function safeRequest(value: unknown) {
   return { method: typeof request.method === 'string' ? request.method : '', path: typeof request.url === 'string' ? request.url.split('?')[0] : '' };
 }
 
-export function createApp(options: FastifyServerOptions, dependencies?: AuthHttpDependencies) {
+export function createApp(options: FastifyServerOptions, dependencies?: AuthHttpDependencies, expenseContext?: ExpenseContextQuery) {
   const logging = options.logger && typeof options.logger === 'object' ? options.logger : {};
   const app = Fastify({ ...options, logger: options.logger ? { ...logging, serializers: {
     req: safeRequest,
@@ -24,6 +26,7 @@ export function createApp(options: FastifyServerOptions, dependencies?: AuthHttp
     err: () => ({ type: 'RequestError', message: 'request_failed', stack: '' }),
   } } : false });
   app.register(cookie);
+  app.decorateRequest('verifiedSession', null);
   app.addHook('onRequest', async (request, reply) => {
     const path = request.routeOptions.url;
     if (!path) return;
@@ -34,6 +37,7 @@ export function createApp(options: FastifyServerOptions, dependencies?: AuthHttp
     const names = authCookies(dependencies);
     const token = app.parseCookie(request.headers.cookie ?? '')[names.session] ?? '';
     const session = await dependencies.service.authenticate(token);
+    request.verifiedSession = session;
     if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
       if (request.headers.origin !== dependencies.appOrigin) return reply.code(403).send({ error: { code: 'invalid_origin' } });
       const supplied = request.headers['x-csrf-token'];
@@ -41,7 +45,7 @@ export function createApp(options: FastifyServerOptions, dependencies?: AuthHttp
     }
   });
   app.addHook('onSend', async (request, reply, payload) => {
-    if (request.routeOptions.url?.startsWith('/api/auth/')) reply.header('cache-control', 'no-store').header('referrer-policy', 'no-referrer');
+    if (request.routeOptions.url?.startsWith('/api/auth/') || request.routeOptions.url === '/api/expense-context') reply.header('cache-control', 'no-store').header('referrer-policy', 'no-referrer');
     return payload;
   });
   app.setNotFoundHandler((_request, reply) => reply.code(404).header('cache-control', 'no-store').send({ error: { code: 'not_found' } }));
@@ -66,5 +70,6 @@ export function createApp(options: FastifyServerOptions, dependencies?: AuthHttp
   });
   registerHealthRoutes(app);
   if (dependencies) registerAuthRoutes(app, dependencies);
+  if (expenseContext) registerExpenseContextRoutes(app, expenseContext);
   return app;
 }

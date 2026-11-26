@@ -26,3 +26,23 @@ test('refuses unexpected filenames or multiline injection without changing the f
   expect(await readFile(file, 'utf8')).toBe('HOST=127.0.0.1\n');
   await expect(saveLocalGoogleSettings(file + '.ts', { GOOGLE_ALLOWED_SUBJECT: 'synthetic' })).rejects.toThrow('Local Google settings unavailable');
 });
+
+test('reconnecting Google preserves quoted JSON mapping configuration and removes the replaced grant', async () => {
+  const file = await path(); const mapping = JSON.stringify({ version: 1, years: [{ spreadsheetId: 'synthetic-workbook-id' }] });
+  const original = `# retained operator comment\nEXPENSE_WORKBOOKS_JSON='${mapping}'\nGOOGLE_SHEETS_REFRESH_TOKEN=old-synthetic\n`;
+  await writeFile(file, original);
+  await saveLocalGoogleSettings(file, { GOOGLE_SHEETS_REFRESH_TOKEN: 'new-synthetic' });
+  const result = await readFile(file, 'utf8');
+  expect(parseEnv(result)).toEqual({ EXPENSE_WORKBOOKS_JSON: mapping, GOOGLE_SHEETS_REFRESH_TOKEN: 'new-synthetic' });
+  expect(result).toContain(`# retained operator comment\nEXPENSE_WORKBOOKS_JSON='${mapping}'`);
+  expect(result).not.toContain('old-synthetic');
+});
+test('credential replacement cannot edit a setting-looking line inside an existing multiline value', async () => {
+  const file = await path(); const block = 'OTHER="first\nGOOGLE_SHEETS_REFRESH_TOKEN=inside-value\nlast"\n';
+  await writeFile(file, block + 'GOOGLE_SHEETS_REFRESH_TOKEN=old-synthetic\n');
+  await saveLocalGoogleSettings(file, { GOOGLE_SHEETS_REFRESH_TOKEN: 'new-synthetic' });
+  const result = await readFile(file, 'utf8');
+  expect(result).toContain(block);
+  expect(parseEnv(result)).toEqual({ OTHER: 'first\nGOOGLE_SHEETS_REFRESH_TOKEN=inside-value\nlast', GOOGLE_SHEETS_REFRESH_TOKEN: 'new-synthetic' });
+  expect(result).not.toContain('old-synthetic');
+});
