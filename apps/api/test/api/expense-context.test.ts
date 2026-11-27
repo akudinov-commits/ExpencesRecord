@@ -17,6 +17,13 @@ function fixture() {
 }
 const browser = { host: 'localhost:5173', cookie: 'expences_session_dev=synthetic-session' };
 const url = '/api/expense-context?date=2099-01-15';
+test('context exposes only the explicitly requested monthly aggregate DTO, without mapping addresses',async()=>{
+ const f=fixture();const value=await f.query.execute(f.session.subject,'2099-01-15');
+ f.query.execute.mockResolvedValue(Object.assign(value,{monthlyTotals:{groceries:{period:'2099-01',status:'available',amount:12500,currency:'KZT'}}}));
+ const response=await f.app.inject({url,headers:browser});
+ expect(response.json().categories[0].monthlyTotal).toEqual({period:'2099-01',status:'available',amount:12500,currency:'KZT'});
+ expect(response.body).not.toMatch(/private-|sheetTitle|spreadsheetId|row|column|rate/);
+});
 test('the new context endpoint requires authentication by default', async () => {
   const f = fixture(); const response = await f.app.inject(url);
   expect(response.statusCode).toBe(401); expect(response.json()).toEqual({ error: { code: 'unauthenticated' } }); expect(f.query.execute).not.toHaveBeenCalled();

@@ -8,6 +8,11 @@ import { SheetsAccessError } from '../../src/application/ports/sheets-access.js'
 import { authFixture } from '../support/auth.js';
 const opened: FastifyInstance[]=[]; afterEach(async()=>{await Promise.all(opened.splice(0).map(app=>app.close()));});
 const input={date:'2020-01-15',amount:'5',categoryId:'groceries',currency:'KZT'};
+test('the protected transport delegates the new ordered stack without applying formula policy',async()=>{
+ const f=fixture();const body={date:'2020-01-15',amounts:['5','10','12'],categoryId:'groceries',currency:'AED'};
+ const response=await f.app.inject({method:'POST',url:'/api/expenses/preview',headers,payload:body});
+ expect(response.statusCode).toBe(200);expect(f.operations.preview).toHaveBeenCalledExactlyOnceWith(f.session.subject,body);
+});
 const preview={...input,storageCurrency:'KZT',currentCell:{hasData:true,calculatedTotal:5,formula:'=(5)',scalarValue:null},proposedFormula:'=(5)+(5)',expectedVersion:'x'.repeat(43),canSave:true,warnings:['existing_data','possible_duplicate']} satisfies ExpensePreview;
 const headers={'content-type':'application/json',host:'localhost:5173',cookie:'expences_session_dev=synthetic-session',origin:'http://localhost:5173','x-csrf-token':'bound-csrf'};
 function fixture(){

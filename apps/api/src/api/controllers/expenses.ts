@@ -7,7 +7,7 @@ const statuses: Record<ExpenseFailure, number> = { invalid_request:400,invalid_a
 export function expensesController(operations: ExpenseOperations, method: keyof ExpenseOperations) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     const body = request.body;
-    const keys = ['date','amount','categoryId','currency','comment',...(method === 'preview' ? [] : ['expectedVersion','acknowledgeExistingData','acknowledgePossibleDuplicate','acknowledgeInconclusive'])];
+    const keys = ['date','amount','amounts','categoryId','currency','comment',...(method === 'preview' ? [] : ['expectedVersion','acknowledgeExistingData','acknowledgePossibleDuplicate','acknowledgeInconclusive'])];
     if (Object.keys(request.query as object).length || !body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).some(key => !keys.includes(key))) return reply.code(400).send({error:{code:'invalid_request'}});
     try {
       if(method === 'preview') {

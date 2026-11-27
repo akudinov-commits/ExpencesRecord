@@ -2,6 +2,19 @@ import type { CurrencyBinding, RateReference, SheetCell } from './ports/workbook
 import { ExpenseError } from './ports/expenses.js';
 const unsupported = (): never => { throw new ExpenseError('unsupported_formula'); };
 const invalidMapping = (): never => { throw new ExpenseError('mapping_invalid'); };
+export function appendExpenses(cell: SheetCell | undefined, terms: string[], sheet: string) {
+  if (!terms.length || terms.length > 20) return unsupported();
+  let current = cell;
+  let formula = '';
+  let duplicate: 'none' | 'possible' | 'inconclusive' = 'none';
+  for (const term of terms) {
+    const observed = appendExpense(cell, term, sheet).duplicate;
+    if (observed === 'possible' || (observed === 'inconclusive' && duplicate === 'none')) duplicate = observed;
+    formula = appendExpense(current, term, sheet).formula;
+    current = { row: cell?.row ?? 1, column: cell?.column ?? 1, value: null, formula };
+  }
+  return { formula, duplicate };
+}
 export function normalizeAmount(value: unknown): string {
   if (typeof value !== 'string' || value.length > 32 || !/^\d+(?:\.\d{1,6})?$/.test(value)) throw new ExpenseError('invalid_amount');
   const [rawInteger, rawFraction = ''] = value.split('.'); const integer = rawInteger!.replace(/^0+(?=\d)/, ''); const fraction = rawFraction.replace(/0+$/, '');

@@ -1,10 +1,10 @@
 import type { CategoryBinding, CurrencyBinding, MappingConfiguration, MonthMapping, Rectangle, WorkbookYear } from '../application/ports/workbook.js';
 export class MappingConfigurationError extends Error { constructor() { super('Invalid mapping configuration'); } }
 const invalid = (): never => { throw new MappingConfigurationError(); };
-function record(value: unknown, keys: string[]): Record<string, unknown> {
+function record(value: unknown, keys: string[], optional: string[] = []): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return invalid();
   const object = value as Record<string, unknown>;
-  if (Object.keys(object).length !== keys.length || keys.some(key => !Object.hasOwn(object, key))) return invalid();
+  if (Object.keys(object).some(key => !keys.includes(key) && !optional.includes(key)) || keys.some(key => !Object.hasOwn(object, key))) return invalid();
   return object;
 }
 function array(value: unknown, maximum: number): unknown[] {
@@ -45,9 +45,12 @@ function month(value: unknown, baseCurrency: string, version: number): MonthMapp
   const dateEncoding = v.dateEncoding;
   if (dateEncoding !== 'serial' && dateEncoding !== 'iso' && dateEncoding !== 'day-first') return invalid();
   const categories = array(v.categories, 200).map<CategoryBinding>(value => {
-    const category = record(value, ['id', 'label', 'column', ...(version === 2 ? ['storageCurrency'] : [])]); const position = column(category.column);
+    const category = record(value, ['id', 'label', 'column', ...(version === 2 ? ['storageCurrency'] : [])], ['monthlyTotal']); const position = column(category.column);
     if (position < range.startColumn || position > range.endColumn || position === dateColumn) return invalid();
-    return { id: string(category.id, 64, /^[a-z][a-z0-9-]*$/), label: string(category.label, 200), column: position, ...(version === 2 ? { storageCurrency: string(category.storageCurrency, 3, /^[A-Z]{3}$/) } : {}) };
+    const monthly = category.monthlyTotal === undefined ? undefined : record(category.monthlyTotal, ['row', 'currency']);
+    return { id: string(category.id, 64, /^[a-z][a-z0-9-]*$/), label: string(category.label, 200), column: position,
+      ...(version === 2 ? { storageCurrency: string(category.storageCurrency, 3, /^[A-Z]{3}$/) } : {}),
+      ...(monthly ? { monthlyTotal: { row: integer(monthly.row, 1, 10000000), currency: string(monthly.currency, 3, /^[A-Z]{3}$/) } } : {}) };
   });
   distinct(categories.map(category => category.id)); distinct(categories.map(category => category.label)); distinct(categories.map(category => category.column));
   const currencies = array(v.currencies, 200).map<CurrencyBinding>(value => {

@@ -1,21 +1,24 @@
 import { GetExpenseContext } from './expense-context.js';
-import { appendExpense, buildExpenseTerm, normalizeAmount } from './expense-formula.js';
+import { appendExpenses, buildExpenseTerm, normalizeAmount } from './expense-formula.js';
 import type { MappingConfigurationSource, SheetCell, SheetReader } from './ports/workbook.js';
 import type { SheetsCredentials } from './ports/sheets-access.js';
 import type { ExpenseCommand, ExpenseFingerprint, ExpenseOperations, ExpenseOutcome, ExpensePreview, ExpenseWarning, ExpenseWriter } from './ports/expenses.js';
 import { ExpenseError } from './ports/expenses.js';
 export interface RegistrationDependencies { mapping: MappingConfigurationSource; readCredentials: SheetsCredentials; writeCredentials: SheetsCredentials; reader: SheetReader; writer: ExpenseWriter; fingerprint: ExpenseFingerprint }
-type Command = ExpenseCommand & { expectedVersion?: string; acknowledgeExistingData?: boolean; acknowledgePossibleDuplicate?: boolean; acknowledgeInconclusive?: boolean };
+type Command = Omit<ExpenseCommand, 'amount' | 'amounts'> & { amounts: string[]; expectedVersion?: string; acknowledgeExistingData?: boolean; acknowledgePossibleDuplicate?: boolean; acknowledgeInconclusive?: boolean };
 function command(value: unknown, mutation: boolean): Command {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new ExpenseError('invalid_request');
   const raw = value as Record<string, unknown>;
-  const keys = ['date', 'amount', 'categoryId', 'currency', 'comment', ...(mutation ? ['expectedVersion', 'acknowledgeExistingData', 'acknowledgePossibleDuplicate', 'acknowledgeInconclusive'] : [])];
+  const keys = ['date', 'amount', 'amounts', 'categoryId', 'currency', 'comment', ...(mutation ? ['expectedVersion', 'acknowledgeExistingData', 'acknowledgePossibleDuplicate', 'acknowledgeInconclusive'] : [])];
   if (Object.keys(raw).some(key => !keys.includes(key))) throw new ExpenseError('invalid_request');
   if (typeof raw.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(raw.date) || Number(raw.date.slice(0, 4)) < 1900
     || !Number.isFinite(Date.parse(`${raw.date}T00:00:00Z`)) || new Date(`${raw.date}T00:00:00Z`).toISOString().slice(0, 10) !== raw.date
     || typeof raw.categoryId !== 'string' || !/^[a-z][a-z0-9-]{0,63}$/.test(raw.categoryId)
     || typeof raw.currency !== 'string' || !/^[A-Z]{3}$/.test(raw.currency)) throw new ExpenseError('invalid_request');
-  const result: Command = { date: raw.date, categoryId: raw.categoryId, currency: raw.currency, amount: normalizeAmount(raw.amount) };
+  if (Object.hasOwn(raw, 'amount') === Object.hasOwn(raw, 'amounts')) throw new ExpenseError('invalid_request');
+  const amounts = Object.hasOwn(raw, 'amounts') ? raw.amounts : [raw.amount];
+  if (!Array.isArray(amounts) || !amounts.length || amounts.length > 20) throw new ExpenseError('invalid_request');
+  const result: Command = { date: raw.date, categoryId: raw.categoryId, currency: raw.currency, amounts: Array.from(amounts, normalizeAmount) };
   if (raw.comment !== undefined) {
     if (typeof raw.comment !== 'string') throw new ExpenseError('invalid_comment');
     const text = raw.comment.replace(/\r\n?/g, '\n').trim();
@@ -67,14 +70,14 @@ export class ExpenseRegistration implements ExpenseOperations {
       { startRow: target.row, endRow: target.row, startColumn: target.column, endColumn: target.column }, accessToken);
     const cell = cells[0];
     if (cells.length > 1 || (cell && (cell.row !== target.row || cell.column !== target.column))) throw new ExpenseError('mapping_invalid');
-    const normalized: ExpenseCommand = { date: cmd.date, amount: cmd.amount, categoryId: cmd.categoryId, currency: cmd.currency, ...(cmd.comment ? { comment: cmd.comment } : {}) };
+    const normalized: ExpenseCommand = { date: cmd.date, amounts: cmd.amounts, categoryId: cmd.categoryId, currency: cmd.currency, ...(cmd.comment ? { comment: cmd.comment } : {}) };
     const expectedVersion = this.dependencies.fingerprint.of([normalized, context, category, cell ?? null, rates]);
     const hasData = !!cell && (!!cell.formula || !!cell.error || (cell.value !== null && cell.value !== ''));
     const warnings: ExpenseWarning[] = hasData ? ['existing_data'] : [];
     let proposedFormula: string | null = null;
     let blockedReason: ExpensePreview['blockedReason'] = this.configuration.writesEnabled ? undefined : 'writes_unavailable';
     try {
-      const addition = appendExpense(cell, buildExpenseTerm(cmd.amount, input, storage, context.target.sheetTitle), context.target.sheetTitle);
+      const addition = appendExpenses(cell, cmd.amounts.map(amount => buildExpenseTerm(amount, input, storage, context.target.sheetTitle)), context.target.sheetTitle);
       proposedFormula = addition.formula;
       if (addition.duplicate === 'possible') warnings.push('possible_duplicate');
       if (addition.duplicate === 'inconclusive') warnings.push('duplicate_check_inconclusive');
@@ -105,7 +108,7 @@ export class ExpenseRegistration implements ExpenseOperations {
         || (preview.warnings.includes('duplicate_check_inconclusive') && !cmd.acknowledgeInconclusive)) throw new ExpenseError('acknowledgment_required');
     }
     return this.dependencies.writer.execute({ ...target, ...(!commentOnly ? { formula: preview.proposedFormula! } : {}),
-      ...(cmd.comment ? { comment: `${cmd.amount} ${cmd.currency}\n${cmd.comment}` } : {}) }, accessToken);
+      ...(cmd.comment ? { comment: `${cmd.amounts.join(' + ')} ${cmd.currency}\n${cmd.comment}` } : {}) }, accessToken);
   }
   async save(subject: string, input: unknown): Promise<ExpenseOutcome> { return this.mutate(subject, input, false); }
   async comment(subject: string, input: unknown): Promise<ExpenseOutcome> { return this.mutate(subject, input, true); }

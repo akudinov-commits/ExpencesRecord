@@ -9,7 +9,12 @@ export function expenseContextController(query: ExpenseContextQuery) {
     try {
       const result = await query.execute(request.verifiedSession?.subject ?? '', request.query.date);
       return reply.send({ date: result.date, baseCurrency: result.baseCurrency,
-        categories: result.categories.map(({ id, label }) => ({ id, label })), currencies: result.currencies.map(({ code }) => ({ code })) });
+        categories: result.categories.map(({ id, label }) => {
+          const total = result.monthlyTotals?.[id];
+          return { id, label, ...(total ? { monthlyTotal: total.status === 'available'
+            ? { period: total.period, status: total.status, amount: total.amount, currency: total.currency }
+            : { period: total.period, status: total.status } } : {}) };
+        }), currencies: result.currencies.map(({ code }) => ({ code })) });
     } catch (error) {
       if (!(error instanceof MappingError)) throw error;
       return reply.code(statuses[error.code]).send({ error: { code: error.code } });
