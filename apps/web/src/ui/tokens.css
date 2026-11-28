@@ -1,0 +1,30 @@
+:root {
+  color-scheme: light dark;
+  --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ui-page: light-dark(#f2f2f7, #141416);
+  --ui-surface: light-dark(#ffffff, #242427);
+  --ui-ink: light-dark(#172b30, #f0f3f2);
+  --ui-secondary: light-dark(#5d656b, #b6bdc1);
+  --ui-line: light-dark(#d5dbdd, #4b5457);
+  --ui-accent: light-dark(#146b58, #74d5b8);
+  --ui-on-accent: light-dark(#ffffff, #10201f);
+  --ui-soft: light-dark(#e0ede7, #254337);
+  --ui-warning: light-dark(#79501b, #f0cd91);
+  --ui-warning-surface: light-dark(#fff2d8, #3a301e);
+  --ui-error: light-dark(#9b3024, #ffb8a7);
+  --ui-error-surface: light-dark(#fff0ec, #3d2521);
+  --ui-success-surface: light-dark(#e3f2e9, #203d2c);
+  --ui-radius: .75rem;
+  --ui-space-1: .25rem;
+  --ui-space-2: .5rem;
+  --ui-space-3: .75rem;
+  --ui-space-4: 1rem;
+  --ui-space-6: 1.5rem;
+  --ui-space-8: 2rem;
+  --ui-body: 1rem;
+  --ui-caption: .8125rem;
+  --ui-title: 2rem;
+  --ui-touch: 2.75rem;
+}
+[data-theme="light"] { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }

@@ -1,7 +1,8 @@
 export interface Rectangle { startRow: number; endRow: number; startColumn: number; endColumn: number }
 export interface CellReference { sheetTitle: string; row: number; column: number }
 export interface RateReference extends CellReference { operation: 'multiply' | 'divide' }
-export interface CategoryBinding { id: string; label: string; column: number; storageCurrency?: string }
+export interface CategoryBinding { id: string; label: string; column: number; storageCurrency?: string; monthlyTotal?: { row: number; currency: string } }
+export type MonthlyCategoryTotal = { period: string; status: 'available'; amount: number; currency: string } | { period: string; status: 'unavailable' };
 export interface CurrencyBinding { code: string; rate: RateReference | null }
 export interface MonthMapping {
   month: number; sheetTitle: string; range: Rectangle; headerRow: number; dateColumn: number;
@@ -17,3 +18,5 @@ export interface SheetReader {
   listSheets(spreadsheetId: string, accessToken: string): Promise<SheetMetadata[]>;
   readCells(spreadsheetId: string, sheetTitle: string, rectangle: Rectangle, accessToken: string): Promise<SheetCell[]>;
 }
+
+export type RecordedExpense = { date: string; status: 'recorded'; amount: number | null; currency: string; formula: string | null } | { date: string; status: 'empty' | 'unavailable' };

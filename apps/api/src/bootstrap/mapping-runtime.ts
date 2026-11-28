@@ -1,5 +1,6 @@
 import { OAuth2Client } from 'google-auth-library';
 import { GetExpenseContext } from '../application/expense-context.js';
+import { GetExpenseEntryContext } from '../application/expense-entry-context.js';
 import type { MappingConfiguration, SheetReader } from '../application/ports/workbook.js';
 import type { SheetsCredentials } from '../application/ports/sheets-access.js';
 import { SheetsAccessError } from '../application/ports/sheets-access.js';
@@ -26,5 +27,6 @@ export function createMappingQuery(environment: NodeJS.ProcessEnv, auth: Pick<Au
     adapter ??= new GoogleSheetsCredentials(new OAuth2Client({ clientId: auth.clientId, clientSecret: auth.clientSecret, transporterOptions: { timeout: 10000, retry: false } }), { clientId: auth.clientId, refreshToken }, systemClock);
     return adapter.get();
   } };
-  return new GetExpenseContext(auth.allowedSubject, source, credentials, dependencies.reader ?? new GoogleSheetReader());
+  const reader = dependencies.reader ?? new GoogleSheetReader();
+  return new GetExpenseEntryContext(new GetExpenseContext(auth.allowedSubject, source, credentials, reader), credentials, reader);
 }

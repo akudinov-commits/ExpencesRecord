@@ -30,11 +30,12 @@ test('configured mapping without its separate Sheets grant fails as reconnect-re
 test('portable composition connects real application mapping through injected inward I/O ports', async () => {
   const cells: SheetCell[] = [{ row: 1, column: 3, value: 'Synthetic groceries' }, { row: 16, column: 1, value: (Date.UTC(2099, 0, 15) - Date.UTC(1899, 11, 30)) / 86400000 }, { row: 39, column: 6, value: 7 }];
   const credentials = { get: vi.fn(async () => ({ subject: authEnvironment.GOOGLE_ALLOWED_SUBJECT, accessToken: 'synthetic-access' })) };
-  const reader = { listSheets: vi.fn<SheetReader['listSheets']>().mockResolvedValue([{ title: 'Synthetic January', rowCount: 65, columnCount: 30 }]), readCells: vi.fn<SheetReader['readCells']>().mockResolvedValue(cells) };
+  const reader = { listSheets: vi.fn<SheetReader['listSheets']>().mockResolvedValue([{ title: 'Synthetic January', rowCount: 65, columnCount: 30 }]), readCells: vi.fn<SheetReader['readCells']>().mockImplementation(async (_id,_title,bounds) => cells.filter(cell => cell.row >= bounds.startRow && cell.row <= bounds.endRow && cell.column >= bounds.startColumn && cell.column <= bounds.endColumn)) };
   const app = createConfiguredApp({ ...authEnvironment, ...mappingEnvironment() }, false, { credentials, reader });
   try {
     const response = await app.inject({ url: '/api/expense-context?date=2099-01-15', headers: { cookie: await cookie() } });
-    expect(response.statusCode).toBe(200); expect(response.json()).toEqual({ date: '2099-01-15', baseCurrency: 'KZT', categories: [{ id: 'groceries', label: 'Synthetic groceries' }], currencies: [{ code: 'KZT' }, { code: 'AED' }] });
-    expect(credentials.get).toHaveBeenCalledOnce(); expect(reader.readCells).toHaveBeenCalledOnce();
+    expect(response.statusCode).toBe(200); expect(response.json()).toEqual({ date: '2099-01-15', baseCurrency: 'KZT', categories: [{ id: 'groceries', label: 'Synthetic groceries', recordedExpense: { date: '2099-01-15', status: 'empty' } }], currencies: [{ code: 'KZT' }, { code: 'AED' }] });
+    expect(credentials.get).toHaveBeenCalledTimes(2); expect(reader.readCells).toHaveBeenCalledTimes(2);
+    expect(reader.readCells.mock.calls[1]![2]).toEqual({ startRow: 16, endRow: 16, startColumn: 3, endColumn: 3 });
   } finally { await app.close(); }
 });

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 export interface AuthPreviewInput { branchRef: string; alias?: string; deploymentUrl: string }
 export function planAuthPreview(input: AuthPreviewInput): { alias: string; deploymentUrl: string } | null {
-  if (input.branchRef !== 'refs/heads/feature/safe-expense-registration-backend') return null;
+  if (input.branchRef !== 'refs/heads/feature/daily-expense-entry-ui') return null;
   if (!input.alias) throw new Error('AUTH_PREVIEW_ALIAS is required');
   if (input.alias !== 'expences-record-auth-preview.vercel.app') throw new Error('Unapproved authentication Preview alias');
   let url: URL;

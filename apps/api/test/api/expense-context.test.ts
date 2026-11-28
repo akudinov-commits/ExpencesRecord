@@ -17,6 +17,13 @@ function fixture() {
 }
 const browser = { host: 'localhost:5173', cookie: 'expences_session_dev=synthetic-session' };
 const url = '/api/expense-context?date=2099-01-15';
+test('context exposes only the explicitly requested monthly aggregate DTO, without mapping addresses',async()=>{
+ const f=fixture();const value=await f.query.execute(f.session.subject,'2099-01-15');
+ f.query.execute.mockResolvedValue(Object.assign(value,{monthlyTotals:{groceries:{period:'2099-01',status:'available',amount:12500,currency:'KZT'}}}));
+ const response=await f.app.inject({url,headers:browser});
+ expect(response.json().categories[0].monthlyTotal).toEqual({period:'2099-01',status:'available',amount:12500,currency:'KZT'});
+ expect(response.body).not.toMatch(/private-|sheetTitle|spreadsheetId|row|column|rate/);
+});
 test('the new context endpoint requires authentication by default', async () => {
   const f = fixture(); const response = await f.app.inject(url);
   expect(response.statusCode).toBe(401); expect(response.json()).toEqual({ error: { code: 'unauthenticated' } }); expect(f.query.execute).not.toHaveBeenCalled();
@@ -51,4 +58,11 @@ test.each(['HEAD', 'POST', 'PUT'] as const)('method %s cannot create another pub
 test('unexpected provider/implementation details never enter the response', async () => {
   const f = fixture(); f.query.execute.mockRejectedValue(new Error('private-provider-financial-marker'));
   const response = await f.app.inject({ url, headers: browser }); expect(response.statusCode).toBe(500); expect(response.body).not.toContain('private-provider-financial-marker'); expect(response.headers['cache-control']).toBe('no-store');
+});
+
+test('context projects the daily recorded/empty/unavailable DTO and strips internal extras',async()=>{
+ const f=fixture();const value=await f.query.execute(f.session.subject,'2099-01-15');
+ f.query.execute.mockResolvedValue(Object.assign(value,{recordedExpenses:{groceries:{date:value.date,status:'recorded',amount:0,currency:'KZT',formula:'=1-1',spreadsheetId:'private-marker',column:3}}}));
+ const response=await f.app.inject({url,headers:browser});expect(response.json().categories[0].recordedExpense).toEqual({date:value.date,status:'recorded',amount:0,currency:'KZT',formula:'=1-1'});expect(response.body).not.toContain('private-');
+ for(const status of ['empty','unavailable']){f.query.execute.mockResolvedValue(Object.assign(value,{recordedExpenses:{groceries:{date:value.date,status}}}));expect((await f.app.inject({url,headers:browser})).json().categories[0].recordedExpense).toEqual({date:value.date,status});}
 });

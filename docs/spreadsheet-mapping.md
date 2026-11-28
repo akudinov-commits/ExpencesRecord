@@ -1,6 +1,6 @@
 # Read-only spreadsheet mapping
 
-The mapping feature is implemented locally on feature/spreadsheet-mapping-configuration. Steps 01-06 are complete; step 07 still requires controlled Google integration and checked hosted verification. This guide describes operator configuration, not an expense-writing feature. No formula, value, format or sheet structure is changed by the application.
+The base mapping feature completed all seven steps and is merged into main. This guide describes its operator configuration and the locally implemented daily-entry monthly-summary extension below; hosted configuration for that extension remains pending approval. No formula, value, format or sheet structure is changed by the application.
 
 ## Configuration and layers
 Set `EXPENSE_WORKBOOKS_JSON` privately, using the approved version-1 schema in the [feature architecture](../ongoing-tasks/spreadsheet-mapping-configuration/feature-architecture.md). Keep real workbook IDs and populated configuration out of Git. `.env.example` contains only the empty setting name. Local `.env` can hold a single-quoted JSON value; keep it on one physical line or use a correctly quoted multiline value. Do not paste credentials or private configuration into chat or shell command arguments.
@@ -16,7 +16,7 @@ Currency codes are configuration entries, not a hardcoded list. The base currenc
 Dates use an explicit encoding: native Sheets integer serial, ISO calendar text or day-first calendar text. The incoming API date is always strict `YYYY-MM-DD`. Configure actual calendar rows, not every row in a copied 31-day template. Missing, duplicate, moved or erroneous dates/headers/rates fail as `mapping_invalid`.
 
 ## Protected context API
-`GET /api/expense-context?date=YYYY-MM-DD` requires the existing encrypted session and application authorization. It has no generated HEAD or write method. The response is no-store and contains only date, base currency, category IDs/labels and currency codes. No workbook ID, sheet/cell/rate address, rate value, expense amount, raw formula or financial history is exposed.
+`GET /api/expense-context?date=YYYY-MM-DD` requires the existing encrypted session and application authorization. It has no generated HEAD or write method. The response is no-store and contains date, base currency, category IDs/labels and currency codes, plus the explicitly requested optional daily observations and monthly totals described below. Mapping/workbook addresses and credentials are not projected. The selected cell's actual formula may include its original references and is returned only to the authorized owner; broader financial history is not exposed.
 
 | Error | HTTP | Meaning |
 |---|---|---|
@@ -56,3 +56,25 @@ GitHub checks and checked Preview delivery passed for feature commit 7fb78b6. Th
 Step 04 inspected June-November through November 26, 2026, read-only. Sanitized structural findings and cached-value verification limits are recorded in the [feature architecture](../ongoing-tasks/spreadsheet-mapping-configuration/feature-architecture.md). Daily/monthly total formulas are heterogeneous, and four reviewed months have differing total definitions. Native-currency buckets and mixed/linked/subtracted expressions also need explicit future write policy. No discrepancy was repaired, and cached checks are not proof of fresh recalculation or correct business inclusions.
 
 Expense registration must separately resolve supported expression grammar, column-native currency handling, write permissions, concurrency, duplicate submissions and ambiguous outcomes. It must not infer an append rule or reuse F39 for every currency/year. Mobile preferences, the expense form, physical iPhone/PWA checks and product Production release remain later features.
+
+## Optional monthly category totals
+
+Schema versions 1 and 2 now accept an optional category monthlyTotal binding, for example `"monthlyTotal":{"row":34,"currency":"KZT"}`. The existing category column/month tab supplies the remaining coordinates. Use a verified explicit row and aggregate currency for each month/year; some columns convert at the aggregate, so this need not equal daily storage or input currency. Missing bindings preserve legacy behavior.
+
+The protected entry-context read may include per-category monthlyTotal with period/status and, when available, the existing finite Sheets amount/currency. The application reads bounded raw cells, groups shared-row requests and limits total rectangle area to 20,000 cells. It does not calculate or repair totals. Blank, error, missing and nonnumeric values are unavailable; a genuine numeric zero remains zero. No mapping address or raw total formula is projected. Expense mutation snapshots do not depend on monthly aggregate values or perform these extra reads. The UI treats this as a small whole-month informational note, excludes the unsaved draft and refreshes after confirmed saving. Live private bindings/fixture changes and hosted verification remain controlled setup steps.
+
+## Recorded expense on the entry screen
+
+The existing owner-only context includes optional per-category recordedExpense with the exact selected date. Status is recorded (amount/currency/formula), empty, or unavailable. A recorded numeric zero remains recorded; error/nonnumeric totals use amount:null, never a guessed zero. The application reads the selected row and existing aggregate rows within a shared 20,000-cell enrichment budget, validates returned coordinates and isolates optional read unavailability. This decoration is exclusive to entry context; core mapping and mutation fingerprints are unchanged.
+
+The entry UI shows a small recorded-amount line before the monthly note, with a native expandable plain-text formula when one exists. It uses category storage currency rather than current input currency, omits the warning for a known empty cell, reports unavailable data explicitly, rejects stale date responses and refreshes after known saving/app return. This advisory observation never replaces Submit's fresh preview/recheck.
+
+The earlier six-category November playground remains physically preserved in Sheet1 A50:G82. The private mapping now replaces that November binding with the structural mock described below; prior January 2020 fixtures remain configured. Real-workbook activation is separate.
+
+## Synthetic annual-workbook mock — 2026-11-28
+
+The user-requested test workbook now has Sep, Oct, Nov and linked Totals tabs, following read-only source layout inspection. Each month has native dates in B, weekday C, daily total A, category headings row 1 and category totals row 34. All actual September–November 2026 dates are configured; short-month template spillover is excluded. Twenty-five named categories are available, retaining their real header labels/columns. Currency-only USD/EUR columns remain in the workbook/summary but are not invented app categories.
+
+KZT is the base; CHF, EUR, USD, UAH and AED refer respectively to F35–F39, RSD to L36 and GBP to L37 on each month tab. These eight choices use synthetic rates. Kiev UAH stores UAH while its monthly aggregate is KZT; the other named categories store KZT. The existing application builds reference-based terms and Google performs calculation. Adding currencies still requires explicit verified settings.
+
+Synthetic examples include grouped additions, a manually authored precedence expression, native-currency buckets, empty cells and a recorded numeric zero. Day 15 has a Supermarket grouped example; November 28 has a recorded zero. Row 34 retains both distinct source total definitions: A34 excludes Utilities/Lessons and follows daily totals, while B34 sums category aggregates excluding Lessons. Their different results are intentional; Totals links both, plus category totals and carry/balance examples. No real expense, income or comment was copied. Old Sheet1 data/styles/notes/comments are preserved. Private configuration was stored locally/Preview; deployment and integration evidence is tracked in the [mock checklist](../ongoing-tasks/realistic-workbook-mock-checklist.md). No real-workbook write or Production activation is included.
