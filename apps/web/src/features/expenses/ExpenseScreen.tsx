@@ -9,10 +9,14 @@ import { ExpenseReview } from './ExpenseReview.js';
 import { expenseMessage } from './messages.js';
 import { useExpenseRegistration } from './registration.js';
 import { CommentRecovery } from './CommentRecovery.js';
+function openDatePicker(input: HTMLInputElement) {
+  try { if (input.showPicker) input.showPicker(); else input.focus(); }
+  catch { input.focus(); }
+}
 export interface ExpenseScreenProps { client: ExpenseClient; csrfToken: string; now?: () => Date; appearanceSetting?: AppearanceSetting; onBusyChange?: (busy:boolean)=>void }
 export function ExpenseScreen({client,csrfToken,now=systemNow,appearanceSetting,onBusyChange}: ExpenseScreenProps) {
   const blocked=useRef(false);const draft=useExpenseDraft(client,now,blocked);const workflow=useExpenseRegistration(client,csrfToken,draft,blocked,onBusyChange);
-  const {saving,previewing}=workflow;const [options,setOptions]=useState(false);const [dateEditor,setDateEditor]=useState(false);
+  const {saving,previewing}=workflow;const [options,setOptions]=useState(false);
   const [setting]=useState(()=>appearanceSetting??browserAppearanceSetting());const [appearance,setAppearance]=useState<Appearance>(()=>setting.read());const [temporaryAppearance,setTemporaryAppearance]=useState(false);
   const optionsHeading=useRef<HTMLHeadingElement>(null);const optionsButton=useRef<HTMLButtonElement>(null);const wasOptions=useRef(false);
   useEffect(()=>{document.documentElement.dataset.theme=appearance;},[appearance]);
@@ -33,8 +37,10 @@ export function ExpenseScreen({client,csrfToken,now=systemNow,appearanceSetting,
   if(activeReview)return <div className="expense-content">{feedback}<ExpenseReview review={activeReview} now={draft.clock} onBack={workflow.back} onConfirm={workflow.confirm} saving={saving} /></div>;
   return <section className="expense-content" aria-label="Expense entry">
     <header className="expense-heading"><h2>Add an expense</h2><IconButton ref={optionsButton} label="Options" disabled={saving} onClick={()=>{draft.invalidate();setOptions(true);}}><span aria-hidden="true">⚙</span></IconButton></header>
-    <div className="expense-date-row"><span className={`u-date ${draft.date<localDate(draft.clock)?'u-date--past':''}`}>{dateLabel}</span><Button variant="quiet" disabled={saving} onClick={()=>setDateEditor(value=>!value)}>Change date</Button></div>
-    {dateEditor&&<Field id="expense-date" label="Date">{control=><TextInput {...control} type="date" disabled={saving} value={draft.date} onChange={event=>draft.edit('date',event.target.value)} />}</Field>}
+    <Field id="expense-date" label="Date">{control=><div className={`expense-date-control u-date ${draft.date<localDate(draft.clock)?'u-date--past':''}`} data-disabled={saving}>
+      <span id="expense-date-display">{dateLabel}</span><span aria-hidden="true">▾</span>
+      <TextInput {...control} type="date" aria-describedby="expense-date-display" disabled={saving} value={draft.date} onChange={event=>draft.edit('date',event.target.value)} onClick={event=>openDatePicker(event.currentTarget)} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openDatePicker(event.currentTarget);}}} />
+    </div>}</Field>
     {!draft.result?<Status busy>Loading categories and currencies…</Status>:contextFailure?<Notice>{expenseMessage(contextFailure)}</Notice>:null}
     {unavailable&&!accessExpired&&<Button variant="quiet" disabled={saving} onClick={draft.refresh}>Retry loading</Button>}
     {feedback}

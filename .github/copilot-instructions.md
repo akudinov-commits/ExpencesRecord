@@ -77,3 +77,5 @@ Completed feature awaiting human review: daily-expense-entry-ui on its feature b
 - GitHub CI checks, checked Vercel Preview delivery and protected health verification pass; evidence is in the foundation checklist. The user explicitly approved merging and pushing the completed authentication feature to main on 2026-11-25; this does not authorize a product Production release. One foundation-only Production initialization with domain assignment skipped was explicitly approved and completed; ongoing product production rollout remains feature 7.
 
 Operational update (2026-11-28): the approved three-cell synthetic fixture and private Preview-only mapping are verified; both approved UI submissions and checked delivery passed. No main merge/Production or real-workbook changes are included.
+
+Active review adjustment: expense-date-control, requested on 2026-11-28 and tracked separately on the existing UI feature branch. One native Date field replaces the badge/button/editor combination; weekday/Today/Past and safe-save locking remain. No mapping/spreadsheet changes or main merge; see its checklist for actual verification/publication status.

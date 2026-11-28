@@ -42,18 +42,18 @@ test('blocked theme storage reports a temporary setting without losing the draft
 test('past-date weekday/month and app-return midnight classification leave the selected date unchanged',async()=>{
  let current=today();open(expenseClient(),()=>current);await choose();current=new Date(2026,10,28,1);act(()=>{fireEvent.focus(window);});
  expect(screen.getByText('Past date · Fri, 27 Nov 2026')).toBeVisible();
- fireEvent.click(screen.getByRole('button',{name:'Change date'}));fireEvent.change(screen.getByLabelText('Date'),{target:{value:'2026-10-15'}});
+ fireEvent.change(screen.getByLabelText('Date'),{target:{value:'2026-10-15'}});
  await waitFor(()=>expect(screen.getByText('Past date · Thu, 15 Oct 2026')).toBeVisible());expect(await screen.findByText(/October 2026.*12,500/)).toBeVisible();
 });
 test('obsolete catalog replies cannot overwrite a new date or its monthly note',async()=>{
  const client=expenseClient();const old=deferred<ApiResult<ExpenseContext>>();client.context.mockReturnValueOnce(old.promise);open(client);
- fireEvent.click(screen.getByRole('button',{name:'Change date'}));fireEvent.change(screen.getByLabelText('Date'),{target:{value:'2026-10-15'}});
+ fireEvent.change(screen.getByLabelText('Date'),{target:{value:'2026-10-15'}});
  await choose();await act(async()=>{old.resolve({state:'ok',value:context});});
  expect(screen.queryByText(/November 2026.*12,500/)).not.toBeInTheDocument();expect(screen.getByText(/October 2026.*12,500/)).toBeVisible();
 });
 test('unconfigured dates expose a clear usable date selection without guessing a catalog',async()=>{
  const client=expenseClient();client.context.mockResolvedValue({state:'error',code:'year_not_configured'});open(client);
- expect(await screen.findByText('This year is not configured. Choose another date.')).toBeVisible();expect(screen.getByRole('button',{name:'Change date'})).toBeEnabled();expect(client.save).not.toHaveBeenCalled();
+ expect(await screen.findByText('This year is not configured. Choose another date.')).toBeVisible();expect(screen.getByLabelText('Date')).toBeEnabled();expect(client.save).not.toHaveBeenCalled();
 });
 test('Options receives keyboard focus and Back restores focus to its originating control',async()=>{
  open();await choose();fireEvent.click(screen.getByRole('button',{name:'Options'}));
@@ -65,4 +65,18 @@ test('an oversized stack and comment are rejected without dropping queued amount
  expect(screen.getByLabelText('Amount')).toHaveAttribute('aria-invalid','true');expect(screen.getAllByRole('listitem')).toHaveLength(20);
  fireEvent.change(screen.getByLabelText('Amount'),{target:{value:''}});fireEvent.change(screen.getByLabelText('Comment (optional)'),{target:{value:'😀'.repeat(376)}});fireEvent.click(screen.getByRole('button',{name:'Submit'}));
  expect(screen.getByLabelText('Comment (optional)')).toHaveAttribute('aria-invalid','true');expect(client.preview).not.toHaveBeenCalled();expect(client.save).not.toHaveBeenCalled();
+});
+
+test('one always-visible Date field combines display and native picker activation',async()=>{
+ open();await choose();const date=screen.getByLabelText('Date');
+ expect(date).toHaveAttribute('type','date');expect(date).toHaveValue('2026-11-27');expect(date).toHaveAccessibleDescription('Today · Fri, 27 Nov 2026');
+ expect(screen.queryByRole('button',{name:'Change date'})).not.toBeInTheDocument();expect(document.querySelectorAll('input[type="date"]')).toHaveLength(1);
+ const showPicker=vi.fn();Object.defineProperty(date,'showPicker',{value:showPicker,configurable:true});fireEvent.click(date);fireEvent.keyDown(date,{key:'Enter'});fireEvent.keyDown(date,{key:' '});expect(showPicker).toHaveBeenCalledTimes(3);
+ fireEvent.change(date,{target:{value:'2026-10-15'}});expect(screen.getByText('Past date · Thu, 15 Oct 2026')).toBeVisible();
+});
+
+test('Date remains usable when native picker activation is unavailable or refused',async()=>{
+ open();await choose();const date=screen.getByLabelText('Date');
+ Object.defineProperty(date,'showPicker',{value:undefined,configurable:true});fireEvent.click(date);expect(date).toHaveFocus();
+ date.blur();Object.defineProperty(date,'showPicker',{value:()=>{throw new Error('activation unavailable');},configurable:true});fireEvent.click(date);expect(date).toHaveFocus();
 });

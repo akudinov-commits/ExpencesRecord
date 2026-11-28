@@ -13,3 +13,5 @@ Run `npm run dev:web` and open `/design-system.html` for the synthetic local gal
 Verify native tab/arrow navigation, 44px or larger action targets, visible focus, labels/help/errors and long/multiline content. Pure visual tokens require visual/contrast review; interaction changes require failing-first tests. Gallery and component tests live in `apps/web/test/ui`.
 
 Actual compositions are in `apps/web/src/features/expenses`: draft/calendar/decimal helpers, registration view-state orchestration, entry/review and independent comment recovery. Options stores only appearance; the same-origin client owns HTTP/DTO mechanics. Later expenses retain earlier pending comment recovery contexts in memory; no comment action re-adds amounts. Local browser QA uses isolated synthetic clients, distinct from real Google/hosted validation.
+
+The expense entry date composes Field/TextInput as one full-width native Date control. The formatted weekday and Today/Past value is the visible surface and accessible description; its native input is the only focusable picker. The wrapper shows focus and disabled states. There is no separate Change date button/editor toggle.

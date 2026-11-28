@@ -54,3 +54,5 @@ Configure GitHub Actions secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJEC
 Read [CLAUDE.md](CLAUDE.md) and [ai-workflow.md](ai-workflow.md). Changes beyond a simple 2–3-line mechanical edit require a feature; behavior/security/architecture/dependency/formula/deployment changes always do regardless of size. For scaffold provenance, see [template-readme.md](template-readme.md).
 
 Bootstrap structure check: `pwsh -NoProfile -File scripts/verify-bootstrap.ps1 -RepoRoot .` (on Windows, use a process-scoped execution-policy option if unsigned local scripts are restricted). This is not an application or TDD-chronology check. Bootstrap inputs remain for review; their cleanup reminder is intentional.
+
+The requested [single Date control follow-up](ongoing-tasks/expense-date-control-checklist.md) combines date display/selection in one native field. Preview still uses the isolated test workbook for 15–16 January 2020; current-year dates intentionally report unconfigured until real-workbook activation is agreed.

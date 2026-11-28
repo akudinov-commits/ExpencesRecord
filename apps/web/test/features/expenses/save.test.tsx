@@ -87,6 +87,6 @@ test('later expenses cannot silently discard an earlier pending comment',async()
 });
 test('a pending direct save blocks amount edits and Options, and repeated Enter cannot dispatch twice',async()=>{
  const client=expenseClient();const pending=deferred<ApiResult<ExpenseOutcome>>();client.save.mockReturnValueOnce(pending.promise);open(client);await fill();
- await waitFor(()=>expect(client.save).toHaveBeenCalledOnce());expect(screen.getByLabelText('Amount')).toBeDisabled();expect(screen.getByRole('button',{name:'Options'})).toBeDisabled();expect(screen.getByRole('button',{name:'Change date'})).toBeDisabled();
+ await waitFor(()=>expect(client.save).toHaveBeenCalledOnce());expect(screen.getByLabelText('Amount')).toBeDisabled();expect(screen.getByRole('button',{name:'Options'})).toBeDisabled();expect(screen.getByLabelText('Date')).toBeDisabled();
  fireEvent.keyDown(screen.getByLabelText('Amount'),{key:'Enter'});expect(client.save).toHaveBeenCalledOnce();await act(async()=>{pending.resolve({state:'ok',value:{expense:'saved',comment:'not_requested'}});});
 });
