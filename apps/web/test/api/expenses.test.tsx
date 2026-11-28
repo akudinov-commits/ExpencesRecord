@@ -55,3 +55,14 @@ test('confirmed expense/comment failure and explicit unknown delivery remain dis
  expect(await client.save({...draft,expectedVersion:version},'csrf')).toEqual({state:'ok',value:{expense:'saved',comment:'failed'}});
  expect(await client.save({...draft,expectedVersion:version},'csrf')).toEqual({state:'ok',value:{expense:'unknown',comment:'unknown'}});
 });
+
+test('daily recorded DTO is narrowed, date-bound and preserves a recorded zero',async()=>{
+ const daily={date:draft.date,status:'recorded',amount:0,currency:'KZT',formula:'=1-1'};const body={...context,categories:[{...context.categories[0],recordedExpense:{...daily,spreadsheetId:'private-marker',column:3}}]};
+ const result=await createExpenseClient(vi.fn<typeof fetch>().mockResolvedValue(reply(body))).context(draft.date);expect(result).toMatchObject({state:'ok',value:{categories:[{recordedExpense:daily}]}});expect(JSON.stringify(result)).not.toContain('private-marker');
+});
+test.each([{date:'2026-10-01',status:'recorded',amount:5,currency:'KZT',formula:null},{date:draft.date,status:'recorded',amount:'5',currency:'KZT',formula:null},{date:draft.date,status:'recorded',amount:5,currency:'KZT',formula:'='+ '1'.repeat(8000)},{date:draft.date,status:'invented'}])('malformed daily observation remains explicitly unavailable: %j',async recordedExpense=>{
+ const body={...context,categories:[{...context.categories[0],recordedExpense}]};const result=await createExpenseClient(vi.fn<typeof fetch>().mockResolvedValue(reply(body))).context(draft.date);expect(result).toMatchObject({state:'ok',value:{categories:[{recordedExpense:{date:draft.date,status:'unavailable'}}]}});
+});
+test.each(['empty','unavailable'])('daily %s stays distinct from zero',async status=>{
+ const recordedExpense={date:draft.date,status};const body={...context,categories:[{...context.categories[0],recordedExpense}]};expect(await createExpenseClient(vi.fn<typeof fetch>().mockResolvedValue(reply(body))).context(draft.date)).toMatchObject({state:'ok',value:{categories:[{recordedExpense}]}});
+});

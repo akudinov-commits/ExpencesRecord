@@ -1,5 +1,6 @@
+export type RecordedExpense = {date:string;status:'recorded';amount:number|null;currency:string;formula:string|null} | {date:string;status:'empty'|'unavailable'};
 export type MonthlyTotal = { period: string; status: 'available'; amount: number; currency: string } | { period: string; status: 'unavailable' };
-export interface ExpenseContext { date: string; baseCurrency: string; categories: { id: string; label: string; monthlyTotal?: MonthlyTotal }[]; currencies: { code: string }[] }
+export interface ExpenseContext { date: string; baseCurrency: string; categories: { id: string; label: string; recordedExpense?: RecordedExpense; monthlyTotal?: MonthlyTotal }[]; currencies: { code: string }[] }
 export interface ExpenseDraft { date: string; amounts: string[]; categoryId: string; currency: string; comment?: string }
 export type ExpenseWarning = 'existing_data' | 'possible_duplicate' | 'duplicate_check_inconclusive';
 export interface ExpensePreview { date: string; categoryId: string; storageCurrency: string; currentCell: { hasData: boolean; calculatedTotal: number | null; formula: string | null; scalarValue: string | number | boolean | null }; proposedFormula: string | null; expectedVersion: string; canSave: boolean; warnings: ExpenseWarning[]; blockedReason?: 'writes_unavailable' | 'unsupported_formula' }
@@ -27,7 +28,18 @@ function contextValue(value: unknown, date: string): ExpenseContext | null {
       monthlyTotal = total?.period === period && total.status === 'available' && typeof total.amount === 'number' && Number.isFinite(total.amount) && text(total.currency, 3, currencyPattern)
         ? { period, status: 'available', amount: total.amount, currency: total.currency } : { period, status: 'unavailable' };
     }
-    categories.push({ id: category.id, label: category.label, ...(monthlyTotal ? { monthlyTotal } : {}) });
+    let recordedExpense: RecordedExpense | undefined;
+    if (category.recordedExpense !== undefined) {
+      const daily = record(category.recordedExpense);
+      recordedExpense = { date, status: 'unavailable' };
+      if (daily?.date === date) {
+        if (daily.status === 'empty' || daily.status === 'unavailable') recordedExpense = { date, status: daily.status };
+        else if (daily.status === 'recorded' && (daily.amount === null || typeof daily.amount === 'number' && Number.isFinite(daily.amount))
+          && text(daily.currency, 3, currencyPattern) && (daily.formula === null || text(daily.formula, 8000, /^=/)))
+          recordedExpense = { date, status: 'recorded', amount: daily.amount, currency: daily.currency, formula: daily.formula };
+      }
+    }
+    categories.push({ id: category.id, label: category.label, ...(recordedExpense ? { recordedExpense } : {}), ...(monthlyTotal ? { monthlyTotal } : {}) });
   }
   for (const value of raw.currencies) { const currency = record(value); if (!currency || !text(currency.code, 3, currencyPattern)) return null; currencies.push({ code: currency.code }); }
   if (new Set(categories.map(category => category.id)).size !== categories.length || new Set(currencies.map(currency => currency.code)).size !== currencies.length) return null;

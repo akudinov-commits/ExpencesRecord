@@ -8,6 +8,7 @@ import { inputTotal, localDate, monthLabel, selectedDateLabel, systemNow, useExp
 import { ExpenseReview } from './ExpenseReview.js';
 import { expenseMessage } from './messages.js';
 import { useExpenseRegistration } from './registration.js';
+import { RecordedExpenseNote } from './RecordedExpenseNote.js';
 import { CommentRecovery } from './CommentRecovery.js';
 function openDatePicker(input: HTMLInputElement) {
   try { if (input.showPicker) input.showPicker(); else input.focus(); }
@@ -47,6 +48,7 @@ export function ExpenseScreen({client,csrfToken,now=systemNow,appearanceSetting,
     {workflow.comments.map(comment=><CommentRecovery key={comment.id} comment={comment} now={draft.clock} busy={saving||previewing||workflow.authRequired} onReview={()=>{void workflow.reviewComment(comment.id);}} onConfirm={()=>{void workflow.addComment(comment.id);}} />)}
     <form className="expense-form" onSubmit={event=>{event.preventDefault();void workflow.submit();}} noValidate><fieldset className="expense-fields" disabled={saving}>
       <Field id="expense-category" label="Category" {...(draft.errors.categoryId?{error:draft.errors.categoryId}:{})}>{control=><Select {...control} value={draft.categoryId} disabled={!draft.context} onChange={event=>draft.edit('categoryId',event.target.value)}><option value="">Choose category</option>{draft.context?.categories.map(category=><option key={category.id} value={category.id}>{category.label}</option>)}</Select>}</Field>
+      {category&&<RecordedExpenseNote key={`${draft.date}:${category.id}`} date={draft.date} value={category.recordedExpense} />}
       <p className="u-help expense-monthly">{!draft.result?'Loading monthly total…':contextFailure?`${monthLabel(draft.date)} · Monthly total unavailable`:!category?'Choose a category to see its monthly total.':total?.status==='available'?`${monthLabel(draft.date)} · ${new Intl.NumberFormat('en-GB',{minimumFractionDigits:2,maximumFractionDigits:6}).format(total.amount)} ${total.currency} already recorded`:`${monthLabel(draft.date)} · Monthly total unavailable`}</p>
       <div className="expense-amount-row"><Field id="expense-amount" label="Amount" {...(draft.errors.amount?{error:draft.errors.amount}:{})}>{control=><TextInput {...control} inputMode="decimal" autoComplete="off" value={draft.amount} placeholder="0.00" onChange={event=>draft.edit('amount',event.target.value)} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();draft.queue();}}} />}</Field>
         <Field id="expense-currency" label="Currency" {...(draft.errors.currency?{error:draft.errors.currency}:{})}>{control=><Select {...control} value={draft.currency} disabled={!draft.context} onChange={event=>draft.edit('currency',event.target.value)}><option value="">Choose</option>{draft.context?.currencies.map(currency=><option key={currency.code}>{currency.code}</option>)}</Select>}</Field></div>

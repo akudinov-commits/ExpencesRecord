@@ -55,4 +55,6 @@ Read [CLAUDE.md](CLAUDE.md) and [ai-workflow.md](ai-workflow.md). Changes beyond
 
 Bootstrap structure check: `pwsh -NoProfile -File scripts/verify-bootstrap.ps1 -RepoRoot .` (on Windows, use a process-scoped execution-policy option if unsigned local scripts are restricted). This is not an application or TDD-chronology check. Bootstrap inputs remain for review; their cleanup reminder is intentional.
 
-The requested [single Date control follow-up](ongoing-tasks/expense-date-control-checklist.md) combines date display/selection in one native field. Preview still uses the isolated test workbook for 15–16 January 2020; current-year dates intentionally report unconfigured until real-workbook activation is agreed.
+The requested [single Date control follow-up](ongoing-tasks/expense-date-control-checklist.md) combines date display/selection in one native field. Preview uses the isolated test workbook with November 2026 configured, retaining 15–16 January 2020. Real-workbook activation remains separate.
+
+Active [recorded-expense context/playground follow-up](ongoing-tasks/recorded-expense-context-checklist.md): compact existing daily amount and expandable formula before the monthly note. The isolated test mapping now includes all November 2026 dates and six categories, retaining January 2020. Test fixture/configuration preservation and focused TDD pass; final checks/checked delivery are tracked in its checklist.

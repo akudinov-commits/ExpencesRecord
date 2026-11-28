@@ -51,3 +51,8 @@ p { margin: 0; line-height: 1.6; }
 .expense-formulas summary { min-height: var(--ui-touch); color: var(--ui-accent); cursor: pointer; }
 .expense-formulas h3 { font-size: .875rem; margin-top: var(--ui-space-3); }
 .expense-formulas p { font-size: var(--ui-caption); white-space: pre-wrap; }
+
+.expense-recorded { margin-top: -1rem; min-width: 0; color: var(--ui-secondary); font-size: var(--ui-caption); line-height: 1.55; }
+.expense-recorded summary { min-height: var(--ui-touch); padding-block: .65rem; cursor: pointer; }
+.expense-recorded summary span:last-child { color: var(--ui-accent); white-space: nowrap; }
+.expense-recorded > p { padding-block: var(--ui-space-2); white-space: pre-wrap; overflow-wrap: anywhere; }

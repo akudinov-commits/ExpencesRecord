@@ -16,7 +16,7 @@ Currency codes are configuration entries, not a hardcoded list. The base currenc
 Dates use an explicit encoding: native Sheets integer serial, ISO calendar text or day-first calendar text. The incoming API date is always strict `YYYY-MM-DD`. Configure actual calendar rows, not every row in a copied 31-day template. Missing, duplicate, moved or erroneous dates/headers/rates fail as `mapping_invalid`.
 
 ## Protected context API
-`GET /api/expense-context?date=YYYY-MM-DD` requires the existing encrypted session and application authorization. It has no generated HEAD or write method. The response is no-store and contains only date, base currency, category IDs/labels and currency codes. No workbook ID, sheet/cell/rate address, rate value, expense amount, raw formula or financial history is exposed.
+`GET /api/expense-context?date=YYYY-MM-DD` requires the existing encrypted session and application authorization. It has no generated HEAD or write method. The response is no-store and contains date, base currency, category IDs/labels and currency codes, plus the explicitly requested optional daily observations and monthly totals described below. Mapping/workbook addresses and credentials are not projected. The selected cell's actual formula may include its original references and is returned only to the authorized owner; broader financial history is not exposed.
 
 | Error | HTTP | Meaning |
 |---|---|---|
@@ -57,8 +57,16 @@ Step 04 inspected June-November through November 26, 2026, read-only. Sanitized 
 
 Expense registration must separately resolve supported expression grammar, column-native currency handling, write permissions, concurrency, duplicate submissions and ambiguous outcomes. It must not infer an append rule or reuse F39 for every currency/year. Mobile preferences, the expense form, physical iPhone/PWA checks and product Production release remain later features.
 
-## Optional monthly category totals (daily-entry feature, local implementation)
+## Optional monthly category totals
 
 Schema versions 1 and 2 now accept an optional category monthlyTotal binding, for example `"monthlyTotal":{"row":34,"currency":"KZT"}`. The existing category column/month tab supplies the remaining coordinates. Use a verified explicit row and aggregate currency for each month/year; some columns convert at the aggregate, so this need not equal daily storage or input currency. Missing bindings preserve legacy behavior.
 
 The protected entry-context read may include per-category monthlyTotal with period/status and, when available, the existing finite Sheets amount/currency. The application reads bounded raw cells, groups shared-row requests and limits total rectangle area to 20,000 cells. It does not calculate or repair totals. Blank, error, missing and nonnumeric values are unavailable; a genuine numeric zero remains zero. No mapping address or raw total formula is projected. Expense mutation snapshots do not depend on monthly aggregate values or perform these extra reads. The UI treats this as a small whole-month informational note, excludes the unsaved draft and refreshes after confirmed saving. Live private bindings/fixture changes and hosted verification remain controlled setup steps.
+
+## Recorded expense on the entry screen
+
+The existing owner-only context includes optional per-category recordedExpense with the exact selected date. Status is recorded (amount/currency/formula), empty, or unavailable. A recorded numeric zero remains recorded; error/nonnumeric totals use amount:null, never a guessed zero. The application reads the selected row and existing aggregate rows within a shared 20,000-cell enrichment budget, validates returned coordinates and isolates optional read unavailability. This decoration is exclusive to entry context; core mapping and mutation fingerprints are unchanged.
+
+The entry UI shows a small recorded-amount line before the monthly note, with a native expandable plain-text formula when one exists. It uses category storage currency rather than current input currency, omits the warning for a known empty cell, reports unavailable data explicitly, rejects stale date responses and refreshes after known saving/app return. This advisory observation never replaces Submit's fresh preview/recheck.
+
+The current synthetic Preview playground covers 1–30 November 2026 with Supermarket, Electronics, Transport, Restaurants, Utilities and Health, all stored in KZT with existing AED input conversion. It uses the separate test workbook's Sheet1 A50:G82 (date rows 51–80, totals row 82). Prior January 2020 fixtures remain configured. The synthetic Q39 rate is deliberately a test rate, not a current market quote. Real-workbook activation is separate.

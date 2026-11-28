@@ -27,7 +27,7 @@ test.each([{row:0,currency:'KZT'},{row:10000001,currency:'KZT'},{row:34,currency
 test('entry context reads the existing monthly aggregate with its own currency, not daily or input currency',async()=>{
  const f=fixture();const result=await f.query.execute('owner',f.context.date);
  expect(result.monthlyTotals?.groceries).toEqual({period:'2020-01',status:'available',amount:12500,currency:'KZT'});
- expect(f.reader.readCells).toHaveBeenCalledExactlyOnceWith('synthetic-workbook-id','Synthetic January',{startRow:34,endRow:34,startColumn:3,endColumn:3},'synthetic-read');
+ expect(f.reader.readCells).toHaveBeenCalledWith('synthetic-workbook-id','Synthetic January',{startRow:34,endRow:34,startColumn:3,endColumn:3},'synthetic-read');
 });
 test.each([0,-5])('finite monthly value %s is displayed faithfully',async value=>{
  const f=fixture();f.reader.readCells.mockResolvedValue([{row:34,column:3,value}]);
@@ -41,9 +41,9 @@ test('formula errors and out-of-bounds or duplicate returned cells never become 
  const f=fixture();for(const cells of [[{row:34,column:3,value:0,error:'REF'}],[{row:35,column:3,value:9}],[{row:34,column:3,value:9},{row:34,column:3,value:10}]]){
  f.reader.readCells.mockResolvedValue(cells);expect((await f.query.execute('owner',f.context.date)).monthlyTotals?.groceries?.status).toBe('unavailable');}
 });
-test('unconfigured monthly totals preserve legacy context and require no extra credentials or reads',async()=>{
+test('unconfigured monthly totals leave only the requested daily enrichment',async()=>{
  const f=fixture();delete f.context.categories[0]!.monthlyTotal;
- expect(await f.query.execute('owner',f.context.date)).toEqual(f.context);expect(f.credentials.get).not.toHaveBeenCalled();expect(f.reader.readCells).not.toHaveBeenCalled();
+ expect(await f.query.execute('owner',f.context.date)).toMatchObject(f.context);expect(f.reader.readCells).toHaveBeenCalledTimes(1);expect(f.reader.readCells.mock.calls[0]![2].startRow).toBe(16);
 });
 test('core authorization failure precedes any monthly read; refreshed subject must also match',async()=>{
  const f=fixture();f.base.execute.mockRejectedValueOnce(new MappingError('access_denied'));
@@ -60,11 +60,11 @@ test('same-row category aggregates are read together with a bounded rectangle',a
  f.reader.readCells.mockResolvedValue([{row:34,column:3,value:9},{row:34,column:4,value:2}]);
  const result=await f.query.execute('owner',f.context.date);
  expect(result.monthlyTotals?.transport).toMatchObject({status:'available',amount:2,currency:'AED'});
- expect(f.reader.readCells).toHaveBeenCalledTimes(1);expect(f.reader.readCells.mock.calls[0]![2]).toEqual({startRow:34,endRow:34,startColumn:3,endColumn:4});
+ expect(f.reader.readCells).toHaveBeenCalledTimes(2);expect(f.reader.readCells.mock.calls[1]![2]).toEqual({startRow:34,endRow:34,startColumn:3,endColumn:4});
 });
 test('out-of-sheet summary references are unavailable and never dispatched',async()=>{
  const f=fixture();f.context.categories[0]!.monthlyTotal!.row=1000;
- expect((await f.query.execute('owner',f.context.date)).monthlyTotals?.groceries?.status).toBe('unavailable');expect(f.reader.readCells).not.toHaveBeenCalled();
+ expect((await f.query.execute('owner',f.context.date)).monthlyTotals?.groceries?.status).toBe('unavailable');expect(f.reader.readCells).toHaveBeenCalledTimes(1);expect(f.reader.readCells.mock.calls[0]![2].startRow).toBe(16);
 });
 test('reconnect and unexpected implementation errors are not silently converted into zero or hidden',async()=>{
  const f=fixture();f.reader.readCells.mockRejectedValueOnce(new SheetsAccessError('reconnect_required'));

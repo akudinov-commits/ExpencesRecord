@@ -18,3 +18,5 @@ export interface SheetReader {
   listSheets(spreadsheetId: string, accessToken: string): Promise<SheetMetadata[]>;
   readCells(spreadsheetId: string, sheetTitle: string, rectangle: Rectangle, accessToken: string): Promise<SheetCell[]>;
 }
+
+export type RecordedExpense = { date: string; status: 'recorded'; amount: number | null; currency: string; formula: string | null } | { date: string; status: 'empty' | 'unavailable' };

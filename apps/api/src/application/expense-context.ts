@@ -1,9 +1,10 @@
-import type { CategoryBinding, CurrencyBinding, MappingConfigurationSource, MonthMapping, MonthlyCategoryTotal, Rectangle, SheetCell, SheetReader } from './ports/workbook.js';
+import type { CategoryBinding, CurrencyBinding, MappingConfigurationSource, MonthMapping, MonthlyCategoryTotal, RecordedExpense, Rectangle, SheetCell, SheetReader } from './ports/workbook.js';
 import type { SheetsCredentials } from './ports/sheets-access.js';
 import { SheetsAccessError } from './ports/sheets-access.js';
 export type MappingFailure = 'invalid_date' | 'year_not_configured' | 'month_not_configured' | 'mapping_invalid' | 'mapping_unavailable' | 'reconnect_required' | 'sheets_unavailable' | 'access_denied';
 export class MappingError extends Error { constructor(public readonly code: MappingFailure) { super(code); } }
 export interface ExpenseContextResult {
+  recordedExpenses?: Record<string, RecordedExpense>;
   monthlyTotals?: Record<string, MonthlyCategoryTotal>;
   date: string; baseCurrency: string; categories: CategoryBinding[]; currencies: CurrencyBinding[];
   target: { spreadsheetId: string; sheetTitle: string; row: number; sheetId?: number };

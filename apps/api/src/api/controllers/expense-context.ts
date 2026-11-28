@@ -11,7 +11,10 @@ export function expenseContextController(query: ExpenseContextQuery) {
       return reply.send({ date: result.date, baseCurrency: result.baseCurrency,
         categories: result.categories.map(({ id, label }) => {
           const total = result.monthlyTotals?.[id];
-          return { id, label, ...(total ? { monthlyTotal: total.status === 'available'
+          const recorded = result.recordedExpenses?.[id];
+          return { id, label, ...(recorded ? { recordedExpense: recorded.status === 'recorded'
+            ? { date: recorded.date, status: recorded.status, amount: recorded.amount, currency: recorded.currency, formula: recorded.formula }
+            : { date: recorded.date, status: recorded.status } } : {}), ...(total ? { monthlyTotal: total.status === 'available'
             ? { period: total.period, status: total.status, amount: total.amount, currency: total.currency }
             : { period: total.period, status: total.status } } : {}) };
         }), currencies: result.currencies.map(({ code }) => ({ code })) });
