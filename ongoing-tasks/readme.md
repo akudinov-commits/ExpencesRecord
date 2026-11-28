@@ -23,6 +23,7 @@ Cross-feature rules: TDD for every behavior change; HTTP-only controllers; appli
 Foundation interview/tooling choices were reconciled in feature 1 step 01. Feature 2 resolved its Google design in Accepted ADR 003 before implementation. Google flow/access decisions belong to feature 2; actual sheet mappings to feature 3; safe concurrent/idempotent writes to feature 4. Do not treat roadmap approval as approval of unselected libraries or mechanisms.
 
 ## Current features
+- [Production release and iPhone setup](production-release-iphone-setup-checklist.md) — explicitly authorized main merge, real-workbook Production and Home Screen setup; four scoped steps active.
 - [Realistic test workbook mock](realistic-workbook-mock-checklist.md) — all three steps complete: synthetic Sep/Oct/Nov/Totals, 25 categories/eight currencies, exact old-sheet preservation, FX change/revert, 734 tests and checked Preview/read-only hosted verification passed. Retained for review on the UI branch.
 - [Recorded expense context and test playground](recorded-expense-context-checklist.md) — all three steps complete: daily amount/formula note, November 2026/six-category test playground, 734 tests, checked Preview and real-owner read-only review passed; retained on the UI review branch.
 - [Expense date control](expense-date-control-checklist.md) — both steps complete: one native Date field, preserved weekday/Today/Past and safe saving; 707 tests, checked Preview and actual native-picker inspection passed. Retained for review on the existing UI branch.
