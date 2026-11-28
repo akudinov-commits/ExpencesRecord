@@ -7,6 +7,8 @@ Open the production URL in Safari on iPhone. Use Share (or More, then Share), ch
 
 Verify category/currency choices, weekday/date, existing amount/formula/month total, Options appearance and safe-area layout. Only enter/save an actual intended expense; never use the real workbook for financial test submissions. A phone screenshot alone does not prove a completed save or fresh backend read-back. Record physical-device evidence separately from automated synthetic-session tests.
 
+The owner confirmed completing Home Screen installation and Google sign-in on iPhone on 2026-11-28. This confirmation does not claim a financial submission or a full physical-device lifecycle audit.
+
 ## Current limits and future periods
 The real workbook has January-November 2026 tabs; all 334 dates are mapped explicitly. December has no tab and remains unavailable until the owner creates it and its mapping is verified. A new 2027 workbook also needs explicit configuration. Per-month rate references and native UAH storage/KZT aggregates follow the verified existing layout. Existing total definitions and all sheet data/formatting remain unchanged.
 
