@@ -78,4 +78,4 @@ Completed feature awaiting human review: daily-expense-entry-ui on its feature b
 
 Operational update (2026-11-28): the approved three-cell synthetic fixture and private Preview-only mapping are verified; both approved UI submissions and checked delivery passed. No main merge/Production or real-workbook changes are included.
 
-Active review adjustment: expense-date-control, requested on 2026-11-28 and tracked separately on the existing UI feature branch. One native Date field replaces the badge/button/editor combination; weekday/Today/Past and safe-save locking remain. No mapping/spreadsheet changes or main merge; see its checklist for actual verification/publication status.
+Completed review adjustment: expense-date-control, requested on 2026-11-28 and tracked separately on the existing UI feature branch. One native Date field replaces the badge/button/editor combination; weekday/Today/Past and safe-save locking remain. No mapping/spreadsheet changes or main merge; both steps passed with 707 tests, checked Preview and actual native-picker inspection. See its checklist for evidence; retain records for human review.
